@@ -1,0 +1,12 @@
+# LaTeX
+tex/*.aux
+tex/*.log
+tex/*.toc
+tex/*.out
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Python
+*.pyc
