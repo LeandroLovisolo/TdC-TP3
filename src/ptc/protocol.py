@@ -11,7 +11,6 @@
 
 import threading
 import random
-import time
 
 
 from cblock import PTCControlBlock
@@ -32,10 +31,10 @@ from thread import Clock, PacketSender, PacketReceiver
 
 class PTCProtocol(object):
     
-    def __init__(self, ack_delay=0, loss_probability=0):
+    def __init__(self, ack_delay=0, ack_loss_probability=0):
         # Modificación
         self.ack_delay = ack_delay
-        self.loss_probability = loss_probability
+        self.ack_loss_probability = ack_loss_probability
 
         self.state = CLOSED
         self.control_block = None
@@ -159,15 +158,7 @@ class PTCProtocol(object):
         updated_rcv_wnd = self.control_block.get_rcv_wnd()
         if updated_rcv_wnd > 0:
             wnd_packet = self.build_packet(window=updated_rcv_wnd)
-            
-            # Original
-            # self.socket.send(wnd_packet)
-
-            # Modificación
-            if random.uniform(0, 1) >= self.loss_probability:
-                time.sleep(self.ack_delay)
-                self.socket.send(wnd_packet)
-
+            self.socket.send(wnd_packet)
         return data
     
     def tick(self):

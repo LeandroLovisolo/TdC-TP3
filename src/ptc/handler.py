@@ -13,6 +13,8 @@ from constants import CLOSED, SYN_RCVD, ESTABLISHED, SYN_SENT,\
                       LISTEN, FIN_WAIT1, FIN_WAIT2, CLOSE_WAIT,\
                       LAST_ACK, CLOSING
 from packet import SYNFlag, ACKFlag, FINFlag
+import random
+import time
 
 
 class IncomingPacketHandler(object):
@@ -32,8 +34,22 @@ class IncomingPacketHandler(object):
         self.protocol.set_state(state)
         
     def send_ack(self):
+        # Original
+        # ack_packet = self.build_packet()
+        # self.socket.send(ack_packet)
+
+        # Modificación
+        # Sólo demorar/perder ACKs en estaado ESTABLISHED
+        if self.protocol.state == ESTABLISHED:
+            # Decidir si se pierde el ACK
+            if random.uniform(0, 1) < self.protocol.ack_loss_probability:
+                return
+            # Si no se pierde, se lo demora
+            time.sleep(self.protocol.ack_delay)
+        # Enviar el ACK
+        print '[IncomingPacketHandler] Sending ACK...'
         ack_packet = self.build_packet()
-        self.socket.send(ack_packet)        
+        self.socket.send(ack_packet)
         
     def handle(self, packet):
         state = self.protocol.state

@@ -19,9 +19,9 @@ from protocol import PTCProtocol
 
 class Socket(object):
     
-    def __init__(self, ack_delay=0, loss_probability=0):
+    def __init__(self, ack_delay=0, ack_loss_probability=0):
         self.protocol = PTCProtocol(ack_delay=ack_delay,
-                                    loss_probability=loss_probability)
+                                    ack_loss_probability=ack_loss_probability)
         self.sockname = None
 
     def bind(self, address_tuple=None):
