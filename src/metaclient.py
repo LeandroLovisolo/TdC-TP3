@@ -6,25 +6,23 @@ import socket
 from struct import pack
 from ptc import Socket as PTCSocket, SHUT_WR
 import sys
-from time import clock
+from time import time
 
 
 def ptc_client(server_ip, size):
     with PTCSocket() as sock:
-      print '[client] Connecting...'
-      sock.connect((server_ip, 6677))
-      print '[client] Connection established.'
-      print '[client] Sending file size...'
-      sock.send(pack('I', size))
-      print '[client] Uploading %d bytes...' % size
-      t0 = clock()
-      sock.send('a' * size)
-      t1 = clock()
-      t = t1 - t0
-      print '[client] Upload time: %f seconds' % t
-
-      # Cerramos el stream de escritura pero podemos seguir recibiendo datos.
-      sock.shutdown(SHUT_WR)
+        print '[client] Connecting...'
+        sock.connect((server_ip, 6677))
+        print '[client] Connection established.'
+        print '[client] Sending file size...'
+        sock.send(pack('I', size))
+        print '[client] Uploading %d bytes...' % size
+        t0 = time()
+        sock.send('a' * size)
+        sock.shutdown(SHUT_WR) # Cerramos el stream de escritura pero podemos seguir recibiendo datos.
+    t1 = time()
+    t = t1 - t0
+    print '[client] Upload time: %f seconds' % t
     print '[client] Connection closed.'
 
 def main(server_ip, server_port, delay, loss, size):
