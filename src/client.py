@@ -7,38 +7,28 @@ from struct import pack
 from time import clock
 from socket import gethostbyname
 
-def main(server_ip, port, size, ack_delay, loss_probability):
-    msg = 'a' * size
-
-    with Socket(ack_delay=ack_delay,
-                loss_probability=loss_probability) as sock:
-      sock.connect((server_ip, port))
-      print 'connection established'
-
-      print 'sending file size...'
+def main(server_ip, size):
+    with Socket() as sock:
+      print '[client] Connecting...'
+      sock.connect((server_ip, 6677))
+      print '[client] Connection established.'
+      print '[client] Sending file size...'
       sock.send(pack('I', size))
-
-      print 'sending %d bytes...' % size
+      print '[client] Uploading %d bytes...' % size
       t0 = clock()
-      sock.send(msg)
+      sock.send('a' * size)
       t1 = clock()
-
       t = t1 - t0
-      print 'took %f seconds' % t
+      print '[client] Upload time: %f seconds' % t
 
       # Cerramos el stream de escritura pero podemos seguir recibiendo datos.
       sock.shutdown(SHUT_WR)
-    print 'all done'
+    print '[client] Connection closed.'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('hostname', help='server hostname')
-    parser.add_argument('port', type=int, help='server PTC port')
-    parser.add_argument('size', type=int, help='number of bytes to be sent')
-    parser.add_argument('-d', '--delay', type=float, default=0.0,
-                        help='ACK delay in seconds (default 0)')
-    parser.add_argument('-l', '--loss', type=float, default=0.0,
-                        help='probability of losing a packet (default 0)')
+    parser.add_argument('size', type=int, help='number of bytes to be uploaded')
     args = parser.parse_args()
 
-    main(gethostbyname(args.hostname), args.port, args.size, args.delay, args.loss)
+    main(gethostbyname(args.hostname), args.size)
