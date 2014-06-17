@@ -10,6 +10,7 @@
 
 
 import threading
+import logging
 
 from buffer import DataBuffer
 from seqnum import SequenceNumber
@@ -28,6 +29,7 @@ class PTCControlBlock(object):
         self.in_buffer = DataBuffer(start_index=receive_seq.clone())
         self.out_buffer = DataBuffer(start_index=send_seq.clone())
         self.lock = threading.RLock()
+        self.logger = logging.getLogger('PTCControlBlock')
         
     def get_snd_nxt(self):
         return self.snd_nxt
@@ -86,6 +88,7 @@ class PTCControlBlock(object):
                 # Decrementar la ventana hasta que se eliminen datos del
                 # buffer.
                 self.rcv_wnd = self.rcv_wnd - len(effective_payload)
+                self.logger.debug('Ventana reducida: rcv_wnd=%d' % self.rcv_wnd)
     
     def process_ack(self, packet):
         ack_number = packet.get_ack_number()
@@ -126,14 +129,14 @@ class PTCControlBlock(object):
             
     def usable_window_size(self):
         # Original
-        # return self.snd_una + self.snd_wnd - self.snd_nxt
+        return self.snd_una + self.snd_wnd - self.snd_nxt
         
         # Modificado
-        usable_window = self.snd_una + self.snd_wnd - self.snd_nxt
-        if usable_window >= 0:
-            return usable_window
-        else:
-            return 0
+        # usable_window = self.snd_una + self.snd_wnd - self.snd_nxt
+        # if usable_window >= 0:
+        #     return usable_window
+        # else:
+        #     return 0
     
     def has_data_to_send(self):
         return not self.out_buffer.empty()
@@ -146,6 +149,7 @@ class PTCControlBlock(object):
         # La ventana debería crecer ahora pues se consumieron datos del buffer.
         with self:
             self.rcv_wnd += len(data)
+            self.logger.debug('Ventana aumentada: rcv_wnd=%d' % self.rcv_wnd)
         return data
     
     def extract_from_out_buffer(self, size):
