@@ -35,7 +35,9 @@ class PTCProtocol(object):
         # Modificación
         self.ack_delay = ack_delay
         self.ack_loss_probability = ack_loss_probability
-        logging.basicConfig(level=logging.DEBUG, filename='ptc.log')
+        logging.basicConfig(level=logging.DEBUG,
+                            format='%(asctime)s:%(levelname)s:%(name)s:%(message)s',
+                            filename='ptc.log')
         self.logger = logging.getLogger('PTCProtocol')
 
         self.state = CLOSED
