@@ -10,6 +10,8 @@
 
 
 import socket
+import sys
+import logging
 
 from ptc.packet_utils import PacketDecoder
 from constants import PROTOCOL_NUMBER, NULL_ADDRESS
@@ -19,9 +21,11 @@ class Soquete(object):
     
     MAX_SIZE = 65535
     
-    def __init__(self):
+    def __init__(self, protocol=None):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, PROTOCOL_NUMBER)
         self.socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+        self.protocol = protocol
+        self.logger = logging.getLogger('Soquete')
         
     def close(self):
         self.socket.close()  
@@ -35,7 +39,16 @@ class Soquete(object):
         data = packet.get_bytes()
         dst_address = packet.get_destination_ip()
         dst_port = packet.get_destination_port()
-        self.socket.sendto(data, (dst_address, dst_port))
+        try:
+            self.socket.sendto(data, (dst_address, dst_port))
+        except socket.error as e:
+            self.logger.critical('[soquete] len(data)=%d' % len(data))
+            self.logger.critical('[soquete] protocol.control_block.snd_una=%d' % self.protocol.control_block.snd_una)
+            self.logger.critical('[soquete] protocol.control_block.snd_wnd=%d' % self.protocol.control_block.snd_wnd)
+            self.logger.critical('[soquete] protocol.control_block.snd_nxt=%d' % self.protocol.control_block.snd_nxt)
+            raise e
+        # sys.stdout.write('.')
+        # sys.stdout.flush()
         
     def receive(self, timeout=None):
         should_stop = False

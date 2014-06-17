@@ -11,7 +11,7 @@
 
 import threading
 import random
-
+import logging
 
 from cblock import PTCControlBlock
 from constants import MSS, CLOSED, ESTABLISHED, SYN_SENT,\
@@ -35,11 +35,13 @@ class PTCProtocol(object):
         # Modificación
         self.ack_delay = ack_delay
         self.ack_loss_probability = ack_loss_probability
+        logging.basicConfig(level=logging.DEBUG)
+        self.logger = logging.getLogger('PTCProtocol')
 
         self.state = CLOSED
         self.control_block = None
         self.packet_builder = PacketBuilder()
-        self.socket = Soquete()
+        self.socket = Soquete(protocol=self)
         self.rcv_wnd = RECEIVE_BUFFER_SIZE        
         self.iss = self.compute_iss()
         self.rqueue = RetransmissionQueue()
@@ -158,6 +160,7 @@ class PTCProtocol(object):
         updated_rcv_wnd = self.control_block.get_rcv_wnd()
         if updated_rcv_wnd > 0:
             wnd_packet = self.build_packet(window=updated_rcv_wnd)
+            self.logger.debug('Enviando window size %d' % updated_rcv_wnd)
             self.socket.send(wnd_packet)
         return data
     
@@ -170,7 +173,9 @@ class PTCProtocol(object):
         to_retransmit = self.rqueue.get_packets_to_retransmit()
         for packet in to_retransmit:
             attempts = self.update_retransmission_attempts_for(packet)
+            self.logger.debug('Retransmitiendo: intento %d' % attempts)
             if attempts > MAX_RETRANSMISSION_ATTEMPTS:
+                self.logger.debug('Límite de retransmisiones alcanzado')
                 # Nos damos por vencidos. Se superó el máximo número de
                 # retransmisiones para este paquete.
                 self.free()

@@ -9,12 +9,15 @@
 ############################################################
 
 
+import random
+import time
+import logging
+
 from constants import CLOSED, SYN_RCVD, ESTABLISHED, SYN_SENT,\
                       LISTEN, FIN_WAIT1, FIN_WAIT2, CLOSE_WAIT,\
                       LAST_ACK, CLOSING
 from packet import SYNFlag, ACKFlag, FINFlag
-import random
-import time
+
 
 
 class IncomingPacketHandler(object):
@@ -22,6 +25,7 @@ class IncomingPacketHandler(object):
     def __init__(self, protocol):
         self.protocol = protocol
         self.socket = self.protocol.socket
+        self.logger = logging.getLogger('IncomingPacketHandler')
         
     def initialize_control_block_from(self, packet):
         self.protocol.initialize_control_block_from(packet)
@@ -43,12 +47,14 @@ class IncomingPacketHandler(object):
         if self.protocol.state == ESTABLISHED:
             # Decidir si se pierde el ACK
             if random.uniform(0, 1) < self.protocol.ack_loss_probability:
+                self.logger.debug('ACK perdido')
                 return
             # Si no se pierde, se lo demora
+            self.logger.debug('ACK demorado')
             time.sleep(self.protocol.ack_delay)
         # Enviar el ACK
-        print '[IncomingPacketHandler] Sending ACK...'
         ack_packet = self.build_packet()
+        self.logger.debug('Enviando ACK: window=%d' % ack_packet.get_window_size())
         self.socket.send(ack_packet)
         
     def handle(self, packet):
