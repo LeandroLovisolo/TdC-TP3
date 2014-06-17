@@ -129,14 +129,14 @@ class PTCControlBlock(object):
             
     def usable_window_size(self):
         # Original
-        return self.snd_una + self.snd_wnd - self.snd_nxt
+        # return self.snd_una + self.snd_wnd - self.snd_nxt
         
         # Modificado
-        # usable_window = self.snd_una + self.snd_wnd - self.snd_nxt
-        # if usable_window >= 0:
-        #     return usable_window
-        # else:
-        #     return 0
+        usable_window = self.snd_una + self.snd_wnd - self.snd_nxt
+        if usable_window >= 0:
+            return usable_window
+        else:
+            return 0
     
     def has_data_to_send(self):
         return not self.out_buffer.empty()
