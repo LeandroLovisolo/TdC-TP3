@@ -160,7 +160,7 @@ class PTCProtocol(object):
         updated_rcv_wnd = self.control_block.get_rcv_wnd()
         if updated_rcv_wnd > 0:
             wnd_packet = self.build_packet(window=updated_rcv_wnd)
-            self.logger.debug('Enviando window size %d' % updated_rcv_wnd)
+            self.logger.debug('Enviando window=%d' % updated_rcv_wnd)
             self.socket.send(wnd_packet)
         return data
     
