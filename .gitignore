@@ -10,3 +10,6 @@ tex/*.out
 
 # Python
 *.pyc
+
+# Logs
+ptc.log
