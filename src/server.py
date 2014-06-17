@@ -19,6 +19,8 @@ def main(ack_delay, ack_loss_probability):
         received = str()
         while len(received) < size:
             received += sock.recv(size - len(received))
+            print '[PTC server] Received %d bytes.' % len(received)
+
         sock.close()
         print '[PTC server] Received %d bytes. Connection closed.' % size
 
