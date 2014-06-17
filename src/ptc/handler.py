@@ -142,6 +142,7 @@ class IncomingPacketHandler(object):
         if FINFlag in packet:
             self.handle_incoming_fin(packet, next_state=CLOSE_WAIT)
         else:
+            self.logger.debug('Paquete recibido: window=%d' % packet.get_window_size())
             self.process_on_control_block(packet)
             if not self.control_block.has_data_to_send():
                 # Si hay datos a punto de enviarse, "piggybackear" el ACK ahí
