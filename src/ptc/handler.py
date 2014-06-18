@@ -50,8 +50,9 @@ class IncomingPacketHandler(object):
                 self.logger.debug('ACK perdido')
                 return
             # Si no se pierde, se lo demora
-            self.logger.debug('ACK demorado')
-            time.sleep(self.protocol.ack_delay)
+            if self.protocol.ack_delay > 0:
+                self.logger.debug('ACK demorado')
+                time.sleep(self.protocol.ack_delay)
         # Enviar el ACK
         ack_packet = self.build_packet()
         self.logger.debug('Enviando ACK: window=%d' % ack_packet.get_window_size())
