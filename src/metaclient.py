@@ -22,9 +22,11 @@ def ptc_client(server_ip, size):
         sock.shutdown(SHUT_WR) # Cerramos el stream de escritura pero podemos seguir recibiendo datos.
     t1 = time()
     t = t1 - t0
+    retransmissions = sock.protocol.retransmissions
     print '[client] Upload time: %f seconds' % t
+    print '[client] Retransmissions: %d' % retransmissions
     print '[client] Connection closed.'
-    return t
+    return t, retransmissions
 
 def transfer(hostname, port=6677, delay=0, loss=0, size=1000):
     server_ip = socket.gethostbyname(hostname)
@@ -37,10 +39,10 @@ def transfer(hostname, port=6677, delay=0, loss=0, size=1000):
     if response != 'OK':
         sys.exit('[metaclient] ERROR: received invalid answer from metaserver: %s' % response)
     print '[metaclient] PTC server up. Connecting...'
-    t = ptc_client(server_ip, size)
+    t, retransmissions = ptc_client(server_ip, size)
     sock.close()
     print '[metaclient] Connection closed.'
-    return t
+    return t, retransmissions
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
