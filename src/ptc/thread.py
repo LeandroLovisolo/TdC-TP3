@@ -89,8 +89,18 @@ class PacketSender(PTCThread):
 class KeepAliveSender(PTCThread):
     
     KEEPALIVE_INTERVAL = 5
-    
+    NAP_INTERVAL = 0.1
+
+    def __init__(self, protocol):
+        PTCThread.__init__(self, protocol)
+        self.schedule_next_keepalive()
+
+    def schedule_next_keepalive(self):
+        self.next_keepalive = time.time() + self.KEEPALIVE_INTERVAL
+
     def do_run(self):
-        time.sleep(self.KEEPALIVE_INTERVAL)
-        if self.protocol.state == ESTABLISHED:
-            self.protocol.send_keepalive()
+        time.sleep(self.NAP_INTERVAL)
+        if time.time() > self.next_keepalive:
+            if self.protocol.state == ESTABLISHED:
+                self.protocol.send_keepalive()
+            self.schedule_next_keepalive()
