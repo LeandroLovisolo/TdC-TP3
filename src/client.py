@@ -23,8 +23,6 @@ def main(server_ip, size):
     print '[client] Upload time: %f seconds' % t
     print '[client] Connection closed.'
 
-      
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('hostname', help='server hostname')

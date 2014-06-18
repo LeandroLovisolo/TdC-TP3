@@ -12,7 +12,7 @@ def main(ack_delay, ack_loss_probability):
         sock.listen()
 
         print '[PTC server] Waiting for a client...'
-        print sock.accept()
+        sock.accept()
         print '[PTC server] Connection established.'
         size = unpack('I', sock.recv(4))[0]
         print '[PTC server] Receiving %d bytes...' % size

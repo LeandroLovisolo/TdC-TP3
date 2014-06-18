@@ -24,20 +24,23 @@ def ptc_client(server_ip, size):
     t = t1 - t0
     print '[client] Upload time: %f seconds' % t
     print '[client] Connection closed.'
+    return t
 
-def main(server_ip, server_port, delay, loss, size):
+def transfer(hostname, port=6677, delay=0, loss=0, size=1000):
+    server_ip = socket.gethostbyname(hostname)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print '[metaclient] Connecting to metaserver...'
-    sock.connect((server_ip, server_port))
+    sock.connect((server_ip, port))
     print '[metaclient] Connected. Requesting delay=%f, loss=%f...' % (delay, loss)
     sock.sendall(pack('dd', delay, loss))
     response = sock.recv(2)
     if response != 'OK':
         sys.exit('[metaclient] ERROR: received invalid answer from metaserver: %s' % response)
     print '[metaclient] PTC server up. Connecting...'
-    ptc_client(server_ip, size)
+    t = ptc_client(server_ip, size)
     sock.close()
     print '[metaclient] Connection closed.'
+    return t
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -50,4 +53,4 @@ if __name__ == '__main__':
                         help='server probability of losing an ACK packet (default 0)')    
     args = parser.parse_args()
 
-    main(socket.gethostbyname(args.hostname), args.port, args.delay, args.loss, args.size)
+    transfer(args.hostname, args.port, args.delay, args.loss, args.size)
