@@ -25,6 +25,7 @@ class PTCControlBlock(object):
         self.rcv_nxt = receive_seq.clone()
         self.rcv_wnd = receive_window
         self.snd_wl1 = receive_seq.clone()
+        self.max_rcv_wnd = receive_window
         self.snd_wl2 = send_seq.clone()
         self.in_buffer = DataBuffer(start_index=receive_seq.clone())
         self.out_buffer = DataBuffer(start_index=send_seq.clone())
@@ -148,7 +149,12 @@ class PTCControlBlock(object):
         data = self.in_buffer.get(size)
         # La ventana debería crecer ahora pues se consumieron datos del buffer.
         with self:
-            self.rcv_wnd += len(data)
+            # Original
+            # self.rcv_wnd += len(data)
+
+            # Modificado
+            self.rcv_wnd = min(self.rcv_wnd + len(data), self.max_rcv_wnd)
+
             self.logger.debug('Ventana aumentada: rcv_wnd=%d' % self.rcv_wnd)
         return data
     
