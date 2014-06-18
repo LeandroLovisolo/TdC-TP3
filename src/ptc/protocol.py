@@ -26,7 +26,7 @@ from packet_utils import PacketBuilder
 from rqueue import RetransmissionQueue
 from seqnum import SequenceNumber
 from soquete import Soquete
-from thread import Clock, PacketSender, PacketReceiver
+from thread import Clock, PacketSender, PacketReceiver, KeepAliveSender
 
 
 class PTCProtocol(object):
@@ -59,22 +59,26 @@ class PTCProtocol(object):
         self.packet_sender = PacketSender(self)
         self.packet_receiver = PacketReceiver(self)
         self.clock = Clock(self)
+        self.keepalive_sender = KeepAliveSender(self)
         
     def start_threads(self):
         self.packet_receiver.start()
         self.packet_sender.start()
         self.clock.start()
+        self.keepalive_sender.start()
         
     def stop_threads(self):
         self.packet_receiver.stop()
         self.packet_sender.stop()
         self.packet_sender.notify()
         self.clock.stop()
+        self.keepalive_sender.stop()
         
     def join_threads(self):
         self.packet_receiver.join()
         self.packet_sender.join()
         self.clock.join()
+        self.keepalive_sender.join()
         
     def set_state(self, state):
         self.state = state
@@ -163,13 +167,12 @@ class PTCProtocol(object):
         updated_rcv_wnd = self.control_block.get_rcv_wnd()
         if updated_rcv_wnd > 0:
             wnd_packet = self.build_packet(window=updated_rcv_wnd)
-            self.logger.debug('Enviando window=%d' % updated_rcv_wnd)
+            self.logger.debug('Enviando window: window=%d' % updated_rcv_wnd)
             self.socket.send(wnd_packet)
         return data
     
     def tick(self):
-        if self.state == ESTABLISHED:
-            self.send_keepalive()
+
         with self.rqueue:
             self.rqueue.tick()
             self.retransmit_packets_if_needed()

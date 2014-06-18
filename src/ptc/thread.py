@@ -13,7 +13,7 @@ import threading
 import socket
 import time
 
-from constants import CLOCK_TICK
+from constants import CLOCK_TICK, ESTABLISHED
 
 
 class PTCThread(threading.Thread):
@@ -84,3 +84,13 @@ class PacketSender(PTCThread):
     def do_run(self):
         self.wait()
         self.protocol.handle_outgoing()
+
+
+class KeepAliveSender(PTCThread):
+    
+    KEEPALIVE_INTERVAL = 5
+    
+    def do_run(self):
+        time.sleep(self.KEEPALIVE_INTERVAL)
+        if self.protocol.state == ESTABLISHED:
+            self.protocol.send_keepalive()
