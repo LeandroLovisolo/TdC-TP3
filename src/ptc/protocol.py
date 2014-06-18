@@ -35,6 +35,7 @@ class PTCProtocol(object):
         # Modificación
         self.ack_delay = ack_delay
         self.ack_loss_probability = ack_loss_probability
+        self.retransmissions = 0
         logging.basicConfig(level=logging.DEBUG,
                             format='%(asctime)s:%(levelname)s:%(name)s:%(message)s',
                             filename='ptc.log')
@@ -167,10 +168,18 @@ class PTCProtocol(object):
         return data
     
     def tick(self):
+        if self.state == ESTABLISHED:
+            self.send_keepalive()
         with self.rqueue:
             self.rqueue.tick()
             self.retransmit_packets_if_needed()
-        
+    
+    def send_keepalive(self):
+        rcv_wnd = self.control_block.get_rcv_wnd()
+        packet = self.build_packet(window=rcv_wnd)
+        self.logger.debug('Enviando keepalive: window=%d' % rcv_wnd)
+        self.socket.send(packet)
+
     def retransmit_packets_if_needed(self):
         to_retransmit = self.rqueue.get_packets_to_retransmit()
         for packet in to_retransmit:
@@ -182,6 +191,7 @@ class PTCProtocol(object):
                 # retransmisiones para este paquete.
                 self.free()
             else:
+                self.retransmissions += 1
                 self.send_and_queue(packet)
     
     def update_retransmission_attempts_for(self, packet):
