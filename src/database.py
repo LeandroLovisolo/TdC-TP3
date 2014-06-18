@@ -40,6 +40,25 @@ class DB:
                          VALUES (?, ?, ?, ?, ?, ?)''',
                       (experiment_id, time, retx, size, delay, loss))
 
+    def get_time_vs_size(self):
+        with self as c:
+            c.execute('SELECT id FROM experiments WHERE name = ?', (DB.TIME_VS_SIZE,))
+            experiment_id = c.fetchone()[0]
+
+            sizes = []
+            for row in c.execute('''SELECT DISTINCT(size) FROM records
+                                    WHERE experiment_id = ?''', (experiment_id,)):
+                sizes.append(row[0])
+
+            time_vs_size = {}
+            for size in sizes:
+                c.execute('''SELECT avg(time) FROM records WHERE
+                             experiment_id = ? AND size = ?''', (experiment_id, size))
+                time = c.fetchone()[0]
+                time_vs_size[size] = time
+
+        return time_vs_size
+
     def __enter__(self):
         self.cur = self.conn.cursor()
         return self.cur
