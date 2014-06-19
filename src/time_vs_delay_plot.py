@@ -6,18 +6,22 @@ import plot
 class TimeVsDelayPlot(plot.Plot):
 
     def do_plot(self, plt, fig, db):
+        colors = ['Blue', 'BlueViolet', 'Brown', 'BurlyWood', 'CadetBlue', 'Chartreuse', 'Chocolate', 'Coral', 'CornflowerBlue', 'Cornsilk']
         loss_probabilities = db.get_time_vs_delay_loss_probabilities()
-        loss = loss_probabilities[0]
 
-        time_vs_delay = db.get_time_vs_delay(loss)
+        for i in range(10):
+            loss = loss_probabilities[i]
 
-        data = time_vs_delay.items()
-        data.sort()
-        data = zip(*data)
-        delays = [s * 1000 for s in data[0]]
-        avgs = list(data[1])
+            time_vs_delay = db.get_time_vs_delay(loss)
 
-        plt.plot(delays, avgs)
+            data = time_vs_delay.items()
+            data.sort()
+            data = zip(*data)
+            delays = [s * 1000 for s in data[0]]
+            avgs = list(data[1])
+
+            plt.plot(delays, avgs, color=colors[i])
+
         plt.xticks(delays, delays, fontsize=9, rotation=90)
         plt.xlim([delays[0], delays[-1]])
         plt.title(u'Tiempo de transferencia en función del retraso en envío de ACKS')
