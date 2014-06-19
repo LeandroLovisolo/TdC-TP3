@@ -26,7 +26,7 @@ class TimeVsDelayAndLossProbabilityPlot(plot.Plot):
         plt.title(u'Tiempo de transferencia en función del retraso en envío de ACKs')
         plt.xlabel(u'Retraso en envío de ACKs (ms)')
         plt.ylabel(u'Tiempo de transferencia promedio (s)')
-        plt.legend(loc=2)
+        plt.legend(loc=2, title=u"Probabilidad de\npérdida de ACKs")
 
 if __name__ == '__main__':
     TimeVsDelayAndLossProbabilityPlot()
