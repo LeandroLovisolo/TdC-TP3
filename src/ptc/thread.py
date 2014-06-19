@@ -101,6 +101,7 @@ class KeepAliveSender(PTCThread):
     def do_run(self):
         time.sleep(self.NAP_INTERVAL)
         if time.time() > self.next_keepalive:
+            print "XXXXXXXXXXXXXXXXXX ENVIANDO KEEPALIVE"
             if self.protocol.state == ESTABLISHED:
                 self.protocol.send_keepalive()
             self.schedule_next_keepalive()
