@@ -55,10 +55,12 @@ class DB:
 
             statistics = {}
             for size in sizes:
-                c.execute('''SELECT avg(time) FROM records WHERE
+                c.execute('''SELECT avg(time) AND avg(retx) FROM records WHERE
                              experiment_id = ? AND size = ?''', (experiment_id, size))
-                time = c.fetchone()[0]
-                statistics[size] = (time,)
+                row = c.fetchone()
+                time = row[0]
+                retransmissions = row[1]
+                statistics[size] = (time, retransmissions)
 
         return statistics
 
@@ -84,13 +86,15 @@ class DB:
 
             time_vs_delay = {}
             for delay in delays:
-                c.execute('''SELECT avg(time) FROM records WHERE
+                c.execute('''SELECT avg(time), avg(retx) FROM records WHERE
                              experiment_id = ? AND
                              CAST(delay * 1000 AS INT) = CAST(? * 1000 AS INT) AND
                              CAST(loss * 1000 AS INT)  = CAST(? * 1000 AS INT)''',
                           (experiment_id, delay, loss_probability))
-                time = c.fetchone()[0]
-                time_vs_delay[delay] = (time,)
+                row = c.fetchone()
+                time = row[0]
+                retransmissions = row[1]
+                time_vs_delay[delay] = (time, retransmissions)
 
         return time_vs_delay
 
