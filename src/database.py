@@ -67,9 +67,9 @@ class DB:
             experiment_id = self.get_experiment_id(DB.TIME_VS_DELAY)
 
             loss_probabilities = []
-            for row in c.execute('''SELECT DISTINCT(loss) AS l FROM records
+            for row in c.execute('''SELECT DISTINCT(CAST((loss * 1000) AS INTEGER)) FROM records
                                     WHERE experiment_id = ?''', (experiment_id,)):
-                loss_probabilities.append(row[0])
+                loss_probabilities.append(row[0] / 1000.0)
 
         return loss_probabilities
 
