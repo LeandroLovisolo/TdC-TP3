@@ -19,7 +19,7 @@ class TimeVsDelayPlot(plot.Plot):
             delays = [s * 1000 for s in data[0]]
             avgs = list(data[1])
 
-            plt.plot(delays, avgs, color=colors.pop(), label=str(loss))
+            plt.plot(delays, avgs, color=colors.pop(), label=str(loss), lw=2)
 
         plt.xticks(delays, delays, fontsize=9, rotation=90)
         plt.xlim([delays[0], delays[-1]])
