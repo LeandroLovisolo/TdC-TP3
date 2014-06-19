@@ -11,9 +11,9 @@ class TimeVsDelayAndLossProbabilityPlot(plot.Plot):
         loss_probabilities = db.get_loss_probabilities()
 
         for loss in loss_probabilities:
-            time_vs_delay = db.get_statistics_by_delay_and_loss_probability(loss)
+            statistics = db.get_statistics_by_delay_and_loss_probability(loss)
 
-            data = time_vs_delay.items()
+            data = statistics.items()
             data.sort()
             data = zip(*data)
             delays = [s * 1000 for s in data[0]]
