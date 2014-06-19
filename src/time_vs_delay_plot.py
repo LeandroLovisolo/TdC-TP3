@@ -8,10 +8,10 @@ class TimeVsDelayPlot(plot.Plot):
     def do_plot(self, plt, fig, db):
         colors = ['Green', 'DarkCyan', 'Indigo', 'Brown', 'DarkGoldenRod', 'Crimson',
                   'Orange', 'GreenYellow', 'DarkMagenta', 'MidnightBlue', 'DimGray']
-        loss_probabilities = db.get_time_vs_delay_loss_probabilities()
+        loss_probabilities = db.get_loss_probabilities()
 
         for loss in loss_probabilities:
-            time_vs_delay = db.get_time_vs_delay(loss)
+            time_vs_delay = db.get_statistics_by_delay_and_loss_probability(loss)
 
             data = time_vs_delay.items()
             data.sort()

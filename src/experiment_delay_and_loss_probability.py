@@ -31,7 +31,7 @@ def main(hostname, port, initial_delay, initial_loss):
                 print '\nDelay %f, probabilidad de pérdida %f, medición %d/%d...' \
                     % (delay, loss, i + 1, n)
                 t, retransmissions = transfer(hostname=hostname, port=port, size=size, delay=delay, loss=loss)
-                db.register(DB.TIME_VS_DELAY, t, retransmissions, size, delay=delay, loss=loss)
+                db.register(DB.DELAY_AND_LOSS_PROBABILITY, t, retransmissions, size, delay=delay, loss=loss)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

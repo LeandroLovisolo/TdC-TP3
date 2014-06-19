@@ -5,11 +5,11 @@ import sqlite3
 
 class DB:
 
-    SIZE  = 'SIZE'
-    TIME_VS_DELAY = 'TIME_VS_DELAY'
+    SIZE = 'SIZE'
+    DELAY_AND_LOSS_PROBABILITY = 'DELAY_AND_LOSS_PROBABILITY'
 
     EXPERIMENTS = [SIZE,
-                   TIME_VS_DELAY]
+                   DELAY_AND_LOSS_PROBABILITY]
 
     def __init__(self):
         self.conn = sqlite3.connect('experiments.db')
@@ -62,9 +62,9 @@ class DB:
 
         return statistics
 
-    def get_time_vs_delay_loss_probabilities(self):
+    def get_loss_probabilities(self):
         with self as c:
-            experiment_id = self.get_experiment_id(DB.TIME_VS_DELAY)
+            experiment_id = self.get_experiment_id(DB.DELAY_AND_LOSS_PROBABILITY)
 
             loss_probabilities = []
             for row in c.execute('''SELECT DISTINCT(CAST((loss * 1000) AS INTEGER)) FROM records
@@ -73,9 +73,9 @@ class DB:
 
         return loss_probabilities
 
-    def get_time_vs_delay(self, loss_probability):
+    def get_statistics_by_delay_and_loss_probability(self, loss_probability):
         with self as c:
-            experiment_id = self.get_experiment_id(DB.TIME_VS_DELAY)
+            experiment_id = self.get_experiment_id(DB.DELAY_AND_LOSS_PROBABILITY)
             
             delays = []
             for row in c.execute('''SELECT DISTINCT(CAST((delay * 1000) AS INTEGER)) FROM records
