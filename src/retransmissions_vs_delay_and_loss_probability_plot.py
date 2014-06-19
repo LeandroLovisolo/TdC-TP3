@@ -27,6 +27,7 @@ class RetransmissionsVsDelayAndLossProbabilityPlot(plot.Plot):
         plt.xlabel(u'Retraso en envío de ACKs (ms)')
         plt.ylabel(u'Retransmisiones')
         plt.legend(loc=2, title=u"Probabilidad de\npérdida de ACKs")
+        plt.yscale('log')
 
 if __name__ == '__main__':
     RetransmissionsVsDelayAndLossProbabilityPlot()
