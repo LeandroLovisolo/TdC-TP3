@@ -24,8 +24,8 @@ class TimeVsDelayPlot(plot.Plot):
 
         plt.xticks(delays, delays, fontsize=9, rotation=90)
         plt.xlim([delays[0], delays[-1]])
-        plt.title(u'Tiempo de transferencia en función del retraso en envío de ACKS')
-        plt.xlabel(u'Retraso en envío de ACKS (ms)')
+        plt.title(u'Tiempo de transferencia en función del retraso en envío de ACKs')
+        plt.xlabel(u'Retraso en envío de ACKs (ms)')
         plt.ylabel(u'Tiempo de transferencia promedio (s)')
 
 if __name__ == '__main__':
