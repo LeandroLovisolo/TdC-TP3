@@ -85,7 +85,9 @@ class DB:
             time_vs_delay = {}
             for delay in delays:
                 c.execute('''SELECT avg(time) FROM records WHERE
-                             experiment_id = ? AND delay = ? AND loss = ?''',
+                             experiment_id = ? AND
+                             CAST(delay * 1000 AS INT) = CAST(? * 1000 AS INT) AND
+                             CAST(loss * 1000 AS INT)  = CAST(? * 1000 AS INT)''',
                           (experiment_id, delay, loss_probability))
                 time = c.fetchone()[0]
                 time_vs_delay[delay] = time
