@@ -3,7 +3,7 @@
 
 import plot
 
-class TimeVsDelayPlot(plot.Plot):
+class TimeVsDelayAndLossProbabilityPlot(plot.Plot):
 
     def do_plot(self, plt, fig, db):
         colors = ['Green', 'DarkCyan', 'Indigo', 'Brown', 'DarkGoldenRod', 'Crimson',
@@ -29,4 +29,4 @@ class TimeVsDelayPlot(plot.Plot):
         plt.legend(loc=2)
 
 if __name__ == '__main__':
-    TimeVsDelayPlot()
+    TimeVsDelayAndLossProbabilityPlot()
