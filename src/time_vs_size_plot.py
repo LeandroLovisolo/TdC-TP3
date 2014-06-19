@@ -10,13 +10,13 @@ class TimeVsSizePlot(plot.Plot):
         data = time_vs_size.items()
         data.sort()
         data = zip(*data)
-        sizes = list(data[0])
+        sizes = [s / 1000 for s in data[0]]
         avgs = list(data[1])
 
         plt.plot(sizes, avgs)
         plt.xticks(sizes, sizes, fontsize=9, rotation=90)
         plt.title(u'Tiempo de transferencia en función del tamaño de archivo')
-        plt.xlabel(u'Tamaño de archivo (B)')
+        plt.xlabel(u'Tamaño de archivo (KB)')
         plt.ylabel(u'Tiempo de transferencia promedio (s)')
 
 if __name__ == '__main__':
