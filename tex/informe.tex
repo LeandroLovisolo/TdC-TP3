@@ -167,6 +167,41 @@ Petaccio, Lautaro José & 443/11 & lausuper@gmail.com\\
 \section{Desarrollo}
 \label{sec:desarrollo}
 
+\subsection{Problemas encontrados}
+
+
+\subsection{Cambios en el código}
+Realizamos modificaciones en el código original con el objetivo de arreglar ciertos problemas que encontramos en el transcurso de la experimentación y poder realizar
+el registro de eventos interesantes para la experimentación.
+
+A continuación, detallaremos los cambios realizados por archivos.
+
+\subsubsection{cblock.py}
+Se incluye a la clase PTCControlBlock el objeto max\_rcv\_wnd con el objetivo de solucionar el problema de que la recieve window incremente de tamaño. Para la solución de este problema, se modificó la función from\_in\_buffer() donde ahora se utiliza el nuevo objeto agregado haciendo que efectivamente no se incremente el tamaño de la recieve window.
+
+Por último, modificó la función usable\_window() por el problema de que se realizaba un mal cálculo de la usable window la cual podía devolver un valor negativo.
+
+\subsubsection{constants.py}
+Se cambió el valor de MSS por 1024 ya que en redes Ethernet se obtenía un error por enviar paquetes de gran tamaño.
+
+\subsubsection{handler.py}
+Se modificó la función send\_ack() para poder realizar la experimentación sobre el protocolo. Se agregó el descarte del paquete ACK utilizando valores aleatorios generados uniformemente utilizando la biblioteca de python random y se agregó para el caso de que el paquete no sea descartado, delay para el mismo.
+
+\subsubsection{protocol.py}
+Se agregan a las funciones initialize\_threads(), start\_threads(), stop\_threads() y join\_threads() los handlers para el nuevo thread Keep Alive.
+
+Se crea la función send\_keepalive() la cual se encarga del envío de paquetes keep alive, los cuales continen como información la receive window del emisor que luego será utilizada en el thread keep alive si es necesario.
+
+\subsubsection{ptc\_socket.py}
+El constructor de la clase Socket ahora toma los parámetros de delay y probabilida de pérdida para la realización de los experimentos. Para el mismo propósito, el objeto protocol, construido con PTCProtocol ahora se llama en su contruscción con los mismo parámetros.
+
+
+\subsubsection{soquete.py}
+La clase soquete percibe cambios para el registro de errores, en especial el problema en el que se aumentaba la receive window.
+
+\subsubsection{thread.py}
+Se agrega la clase KeepAliveSender que funcionará como el nuevo thread agregado para poder solucionar el problema en el que la recepción de una adviced window 0 hace que ambos, receptor y emisor queden esperando la recepción de datos. La función do\_run() de la clase es la encargada de enviar en intervalos, los paquetes keep alive para poder recibir la nueva advice window del receptor.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Resultados                                                                %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
