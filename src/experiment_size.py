@@ -19,7 +19,7 @@ def main(hostname, port):
         for i in range(0, n):
             print '\nTamaño %d, medición %d/%d...' % (size, i + 1, n)
             t, retransmissions = transfer(hostname=hostname, port=port, size=size)
-            db.register(DB.TIME_VS_SIZE, t, retransmissions, size)
+            db.register(DB.SIZE, t, retransmissions, size)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

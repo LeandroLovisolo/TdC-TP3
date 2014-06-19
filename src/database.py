@@ -5,10 +5,10 @@ import sqlite3
 
 class DB:
 
-    TIME_VS_SIZE  = 'TIME_VS_SIZE'
+    SIZE  = 'SIZE'
     TIME_VS_DELAY = 'TIME_VS_DELAY'
 
-    EXPERIMENTS = [TIME_VS_SIZE,
+    EXPERIMENTS = [SIZE,
                    TIME_VS_DELAY]
 
     def __init__(self):
@@ -44,32 +44,32 @@ class DB:
                          VALUES (?, ?, ?, ?, ?, ?)''',
                       (experiment_id, time, retx, size, delay, loss))
 
-    def get_time_vs_size(self):
+    def get_statistics_by_size(self):
         with self as c:
-            experiment_id = self.get_experiment_id(DB.TIME_VS_SIZE)
+            experiment_id = self.get_experiment_id(DB.SIZE)
 
             sizes = []
             for row in c.execute('''SELECT DISTINCT(size) FROM records
                                     WHERE experiment_id = ?''', (experiment_id,)):
                 sizes.append(row[0])
 
-            time_vs_size = {}
+            statistics = {}
             for size in sizes:
                 c.execute('''SELECT avg(time) FROM records WHERE
                              experiment_id = ? AND size = ?''', (experiment_id, size))
                 time = c.fetchone()[0]
-                time_vs_size[size] = time
+                statistics[size] = time
 
-        return time_vs_size
+        return statistics
 
     def get_time_vs_delay_loss_probabilities(self):
         with self as c:
             experiment_id = self.get_experiment_id(DB.TIME_VS_DELAY)
 
             loss_probabilities = []
-            for row in c.execute('''SELECT DISTINCT(loss) AS l FROM records
+            for row in c.execute('''SELECT DISTINCT(CAST((loss * 1000) AS INTEGER)) FROM records
                                     WHERE experiment_id = ?''', (experiment_id,)):
-                loss_probabilities.append(row[0])
+                loss_probabilities.append(row[0] / 1000.0)
 
         return loss_probabilities
 

@@ -6,8 +6,8 @@ import plot
 class TimeVsSizePlot(plot.Plot):
 
     def do_plot(self, plt, fig, db):
-        time_vs_size = db.get_time_vs_size()
-        data = time_vs_size.items()
+        statistics = db.get_statistics_by_size()
+        data = statistics.items()
         data.sort()
         data = zip(*data)
         sizes = [s / 1000 for s in data[0]]
