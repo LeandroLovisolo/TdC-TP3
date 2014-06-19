@@ -11,7 +11,7 @@ class TimeVsSizePlot(plot.Plot):
         data.sort()
         data = zip(*data)
         sizes = [s / 1000 for s in data[0]]
-        avgs = list(data[1])
+        avgs = zip(*data[1])[0]
 
         plt.plot(sizes, avgs)
         plt.xticks(sizes, sizes, fontsize=9, rotation=90)
