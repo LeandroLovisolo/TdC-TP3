@@ -17,7 +17,7 @@ class TimeVsDelayAndLossProbabilityPlot(plot.Plot):
             data.sort()
             data = zip(*data)
             delays = [s * 1000 for s in data[0]]
-            avgs = list(data[1])
+            avgs = zip(*data[1])[0]
 
             plt.plot(delays, avgs, color=colors.pop(), label=str(loss), lw=2)
 
