@@ -55,7 +55,7 @@ class DB:
 
             statistics = {}
             for size in sizes:
-                c.execute('''SELECT avg(time) AND avg(retx) FROM records WHERE
+                c.execute('''SELECT avg(time), avg(retx) FROM records WHERE
                              experiment_id = ? AND size = ?''', (experiment_id, size))
                 row = c.fetchone()
                 time = row[0]
