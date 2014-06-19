@@ -58,7 +58,7 @@ class DB:
                 c.execute('''SELECT avg(time) FROM records WHERE
                              experiment_id = ? AND size = ?''', (experiment_id, size))
                 time = c.fetchone()[0]
-                statistics[size] = time
+                statistics[size] = (time,)
 
         return statistics
 
@@ -90,7 +90,7 @@ class DB:
                              CAST(loss * 1000 AS INT)  = CAST(? * 1000 AS INT)''',
                           (experiment_id, delay, loss_probability))
                 time = c.fetchone()[0]
-                time_vs_delay[delay] = time
+                time_vs_delay[delay] = (time,)
 
         return time_vs_delay
 
