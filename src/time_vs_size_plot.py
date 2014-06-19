@@ -7,10 +7,13 @@ class TimeVsSizePlot(plot.Plot):
 
     def do_plot(self, plt, fig, db):
         time_vs_size = db.get_time_vs_size()
-        sizes = time_vs_size.keys()
-        sizes.sort()
-        for size in sizes:
-            print '%d: %f' % (size, time_vs_size[size])
+        data = time_vs_size.items()
+        data.sort()
+        data = zip(*data)
+        sizes = list(data[0])
+        avgs = list(data[1])
+
+        plt.plot(sizes, avgs)
 
 if __name__ == '__main__':
     TimeVsSizePlot()
