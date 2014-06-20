@@ -401,7 +401,7 @@ En la figura \ref{plot:time_vs_size} podemos observar cómo el tiempo de transfe
 
 Se obtuvo como resultado de los experimentos realizados sobre retransmisión en función de tamaño del archivo que, salvo unos outliers que pueden identificarse en la figura \ref{plot:retransmissions_vs_size}, la cantidad de retransmisión se mantiene estable en promedio. Puede observarse más detalladamente en la figura \ref{plot:retransmissions_vs_size_wo_outliers}, de la cuál, como el nombre lo indica, fueron eliminados los outliers (retransmisiones eran mayores a 10), que el promedio de retransmisiones cumple con lo dicho.
 
-Suponemos que esto es debido a que, como la pérdida se realiza sobre el primer ACK que envía el servidor al recibir los datos, y como en la experimentación, el servidor está continuamente leyendo datos, la lectura rápida del servidor hará que la ventana de recepción del servidor se libere rápidamente, enviando el ACK que informa la nueva ventana el cuál reemplazará al ACK anterior, sin necesidad de realizar retransmisión por parte del cliente.
+Este resultado no fue el que esperábamos, ya que al incrementar la cantidad de datos enviados, esperaríamos obtener una cantidad mayor de retransmisiones, siguiendo la idea intuitiva de que en un uso prolongado se repetirían las retransmisiones.
 
 \subsection{Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
 
@@ -425,8 +425,16 @@ Suponemos que este fenómeno ocurre debido a que, al aplicar delay al ACK que es
 
 \section{Conclusión}
 
+El protocolo PTC, como originalmente fue provisto, contenía una serie de problemas que dificultaban su usabilidad y la experimentación sobre el mismo. Una vez solucionados esos problemas PTC funcionó como protocolo de transporte para los experimentos realizados, de los cuales podemos concluir lo siguiente:
 
+\begin{itemize}
+  \item El tiempo de transmisión aumenta linealmente en relación al tamaño del archivo a enviar.
+  \item No es posible encontrar una correlación entre la cantidad de retransmisiones y el tamaño de los archivos enviados.
+  \item A mayor pérdida de paquetes ACK por datos recibidos, menor tiempo de transmisión de datos.
+  \item A mayor delay de paquetes ACK por datos recibidos, mayor tiempo de transmisión de datos.
+\end{itemize}
 
+Obviando la primera conclusión propuesta resultante de la experimentación, las demás conclusiones obtenidas no pudieron ser explicadas ya que no fueron encontrados relaciones algunas con la implementación o el uso de la red.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Trabajo futuro                                                            %%
@@ -435,6 +443,11 @@ Suponemos que este fenómeno ocurre debido a que, al aplicar delay al ACK que es
 
 \section{Trabajo futuro}
 
+Panteamos como trabajo futuro:
+\begin{itemize}
+\item Una vez corregidos completamente los errores descriptos, realizar nuevamente la experimentación propuesta.
+\item Realizar un test más exhaustivo sobre otras anomalías que pudieran existir en una comunicación utilizandose el protocolo, por ejemplo, la pérdida de paquetes y delays en los ACK utilizados para notificar un cambio de ventana al liberar datos del buffer de recepción.
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Referencias                                                               %%
