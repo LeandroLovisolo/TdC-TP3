@@ -21,7 +21,7 @@ class TimeVsDelayAndLossProbabilityPlot(plot.Plot):
 
             plt.plot(delays, avgs, color=colors.pop(), label=str(loss), lw=2)
 
-        plt.xticks(delays, delays, fontsize=9, rotation=90)
+        plt.xticks(delays, delays, rotation=90)
         plt.xlim([delays[0], delays[-1]])
         plt.title(u'Tiempo de transferencia en función del retraso en envío de ACKs')
         plt.xlabel(u'Retraso en envío de ACKs (ms)')

@@ -22,7 +22,9 @@ class Plot:
                              'text.latex.unicode': True,
                              'font.family':        'lmodern',
                              'font.size':          10,
-                             'axes.titlesize':     10})
+                             'axes.titlesize':     10,
+                             'legend.fontsize':    10,
+                             'legend.labelspacing':0.2})
 
         fig = plt.figure()
         fig.set_size_inches(6, 4) 

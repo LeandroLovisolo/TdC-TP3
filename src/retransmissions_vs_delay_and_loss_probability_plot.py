@@ -22,7 +22,7 @@ class RetransmissionsVsDelayAndLossProbabilityPlot(plot.Plot):
 
             plt.plot(delays, retransmissions, color=colors.pop(), label=str(loss), lw=2)
 
-        plt.xticks(delays, delays, fontsize=9, rotation=90)
+        plt.xticks(delays, delays, rotation=90)
         plt.xlim([delays[0], delays[-1]])
         plt.title(u'Cantidad de retransmisiones en función del retraso en envío de ACKs')
         plt.xlabel(u'Retraso en envío de ACKs (ms)')
