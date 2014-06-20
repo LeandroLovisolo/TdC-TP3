@@ -313,6 +313,7 @@ Para cada transmisión se registró el tiempo total de transmisión y la cantida
 \label{sec:resultados}
 
 \subsection{Distintos tamaños de archivo, sin retraso ni pérdida de ACKs}
+\label{sec:experimento-distintos-tamanos-de-archivo}
 
 \grafico{time_vs_size}
         {Tiempo de transferencia en función del tamaño de archivo}
@@ -322,7 +323,9 @@ Para cada transmisión se registró el tiempo total de transmisión y la cantida
         {Retransmisiones en función del tamaño de archivo}
         {plot:retransmissions_vs_size}
 
-Como puede verse, existen algunos outliers que consideramos que afectan el cálculo de los promedios. Conforman menos del 3\% del total de registros\footnote{Los registros correspondientes a $retransmisiones \ge 10$}, por lo que para tener otra visión sobre el resultado, decidimos realizar el siguiente gráfico sin esos valores.
+Los picos que se observan en la figura \ref{plot:retransmissions_vs_size} se deben a la presencia de outliers que creemos son errores de medición.
+
+Para visualizar mejor estos resultados, filtramos todas las transmisiones con cantidad de retransmisiones superior a 10, que representan aproximadamente el 3\% del total de las mediciones. El subconjunto obtenido se ilustra en la figura \ref{plot:retransmissions_vs_size_wo_outliers}.
 
 \grafico{retransmissions_vs_size_wo_outliers}
         {Retransmisiones en función del tamaño de archivo, excluyendo outliers}
@@ -339,7 +342,9 @@ Como puede verse, existen algunos outliers que consideramos que afectan el cálc
         {Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
         {plot:retransmissions_vs_delay_and_loss_probability}
 
-Como sucedía en la figura \ref{plot:retransmissions_vs_size}, aquí también vemos precencia de outliers que afectan nuestros cálculos. Esta vez son menos del 2\% del total\footnote{Se mantiene el valor 10 como límite de retransmisiones}, así que nuevamente procedemos a realizar una representación sin estos registros.
+De manera similar a lo que ocurre en \ref{sec:experimento-distintos-tamanos-de-archivo}, los picos observados en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability} se deben a outliers que suponemos se deben a errores de medición.
+
+En la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers} se excluyen las mediciones con cantidad de retransmisiones superior a 10, que representan aproximadamente el 2\% del total de las mediciones realizadas en este experimento.
 
 \grafico{retransmissions_vs_delay_and_loss_probability_wo_outliers}
         {Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs, excluyendo outliers}
