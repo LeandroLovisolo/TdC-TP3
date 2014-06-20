@@ -17,7 +17,7 @@
 \usepackage{tabularx}
 \usepackage{multirow}
 \usepackage{hyperref}
-\usepackage{bytefield}
+\usepackage{xspace}
 \usepackage[toc, page]{appendix}
 
 
@@ -64,6 +64,13 @@
   \end{figure}
 }
 %%%%%%%%%% Insertar gráfico - Fin %%%%%%%%%%
+
+
+%%%%%%%%%% Palabras clave - Inicio %%%%%%%%%%
+\newcommand{\established}{\texttt{ESTABLISHED}\xspace}
+\newcommand{\ack}{\texttt{\#ACK}\xspace}
+\newcommand{\window}{\texttt{ventana}\xspace}
+%%%%%%%%%% Palabras clave - Fin %%%%%%%%%%
 
 
 \begin{document}
@@ -159,9 +166,25 @@ Se partió de una implementación del protocolo PTC\footnote{Esta implementació
 En lo que sigue se describen algunos escenarios que ocurren al usar la implementación original. La motivación de esto es dar un contexto para las modificaciones que se introducen en \ref{sec:simulacion-fenomenos} y los problemas observados en \ref{sec:problemas-observados}.
 
 
-\subsubsection{Envío de ACKs}
+\subsubsection{Envío de ACK}
 
-Pendiente.
+Cuando la conexión está en estado \established y se recibe un paquete con payload, ocurre alguna de las siguientes situaciones:
+
+\begin{itemize}
+  \item Se ignora el payload, por ejemplo en caso que la ventana de recepción es nula o que los bytes del payload están fuera de la ventana de recepción.
+
+  \item Se almacena total o parcialmente el payload recibido en el buffer de recepción y se reduce la ventana de recepción en tantos bytes como los que se hayan almacenado en ese buffer.
+\end{itemize}
+
+A su vez, en el caso que se almacenan bytes en el buffer de recepción, la implementación notifica al interlocutor enviando un paquete cuyo campo \ack tiene el valor del número de secuencia del próximo byte que se espera recibir y cuyo campo \window indica el nuevo tamaño de la ventana de recepción. Esto puede ocurrir de dos maneras distintas:
+
+\begin{itemize}
+  \item Cuando hay datos en el buffer de emisión, se aprovecha el envío del próximo paquete con datos al interlocutor (caso conocido como \textit{piggybacking}.)
+
+  \item Cuando el buffer de emisión está vacío, se envía un paquete sin payload con el único propósito que el interlocutor reciba los valores de los campos \ack y \window.
+\end{itemize}
+
+La acción de enviar un paquete sin payload con el único propósito de comunicar la recepción de un paquete proveniente del interlocutor se refiere de ahora en más como \textit{envío de ACK}.
 
 
 \subsubsection{Envío de ventana actualizada}
