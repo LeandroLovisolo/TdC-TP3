@@ -5,13 +5,14 @@ import plot
 
 class RetransmissionsVsDelayAndLossProbabilityPlot(plot.Plot):
 
-    def do_plot(self, plt, fig, db):
+    def do_plot(self, plt, fig, db, args):
         colors = ['Green', 'DarkCyan', 'Indigo', 'Brown', 'DarkGoldenRod', 'Crimson',
                   'Orange', 'GreenYellow', 'DarkMagenta', 'MidnightBlue', 'DimGray']
         loss_probabilities = db.get_loss_probabilities()
 
         for loss in loss_probabilities:
-            statistics = db.get_statistics_by_delay_and_loss_probability(loss)
+            statistics = db.get_statistics_by_delay_and_loss_probability(
+                loss, exclude_outliers=args.exclude_outliers)
 
             data = statistics.items()
             data.sort()
@@ -26,8 +27,11 @@ class RetransmissionsVsDelayAndLossProbabilityPlot(plot.Plot):
         plt.title(u'Cantidad de retransmisiones en función del retraso en envío de ACKs')
         plt.xlabel(u'Retraso en envío de ACKs (ms)')
         plt.ylabel(u'Retransmisiones')
-        plt.legend(loc=2, title=u"Probabilidad de\npérdida de ACKs")
-        plt.yscale('log')
+        plt.legend(loc=2, title=u'Probabilidad de\npérdida de ACKs')
+        #plt.yscale('log')
+
+    def add_arguments(self, parser):
+        parser.add_argument('--exclude-outliers', action='store_true')
 
 if __name__ == '__main__':
     RetransmissionsVsDelayAndLossProbabilityPlot()

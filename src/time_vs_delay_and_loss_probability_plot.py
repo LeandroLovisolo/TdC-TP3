@@ -5,7 +5,7 @@ import plot
 
 class TimeVsDelayAndLossProbabilityPlot(plot.Plot):
 
-    def do_plot(self, plt, fig, db):
+    def do_plot(self, plt, fig, db, args):
         colors = ['Green', 'DarkCyan', 'Indigo', 'Brown', 'DarkGoldenRod', 'Crimson',
                   'Orange', 'GreenYellow', 'DarkMagenta', 'MidnightBlue', 'DimGray']
         loss_probabilities = db.get_loss_probabilities()

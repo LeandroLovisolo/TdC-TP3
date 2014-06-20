@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import sys
 import sqlite3
 
 
@@ -75,7 +76,12 @@ class DB:
 
         return loss_probabilities
 
-    def get_statistics_by_delay_and_loss_probability(self, loss_probability):
+    def get_statistics_by_delay_and_loss_probability(self, loss_probability, exclude_outliers=False):
+        if exclude_outliers:
+            max_retx = 10
+        else:
+            max_retx = sys.maxint
+
         with self as c:
             experiment_id = self.get_experiment_id(DB.DELAY_AND_LOSS_PROBABILITY)
             
@@ -88,9 +94,10 @@ class DB:
             for delay in delays:
                 c.execute('''SELECT avg(time), avg(retx) FROM records WHERE
                              experiment_id = ? AND
+                             retx <= ? AND
                              CAST(delay * 1000 AS INT) = CAST(? * 1000 AS INT) AND
                              CAST(loss * 1000 AS INT)  = CAST(? * 1000 AS INT)''',
-                          (experiment_id, delay, loss_probability))
+                          (experiment_id, max_retx, delay, loss_probability))
                 row = c.fetchone()
                 time = row[0]
                 retransmissions = row[1]

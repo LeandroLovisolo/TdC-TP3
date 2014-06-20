@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import sys
+import argparse
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 
@@ -9,10 +9,12 @@ from database import DB
 
 class Plot:
     def __init__(self):
-        # Read and validate command-line arguments
-        if len(sys.argv) != 1 and len(sys.argv) != 3:  sys.exit(self.help())
-        if len(sys.argv) == 3 and sys.argv[1] != '-o': sys.exit(self.help())
-        output_path = sys.argv[2] if len(sys.argv) == 3 else None
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-o', '--output-path', help='path on which to save the plot')
+        self.add_arguments(parser)
+        args = parser.parse_args()
+        
+        output_path = args.output_path
 
         plt.rcParams['text.latex.preamble']=[r'\usepackage{lmodern}']
         plt.rcParams.update({'text.usetex':        True,
@@ -24,7 +26,7 @@ class Plot:
         fig = plt.figure()
 
         db = DB()
-        self.do_plot(plt, fig, db)
+        self.do_plot(plt, fig, db, args)
 
         plt.tight_layout()
 
@@ -33,10 +35,8 @@ class Plot:
         else:
             plt.show()
 
-    def help():
-        return 'Usage: %s            Produces an on-screen interactive graph from standard input data.\n' \
-               '       %s -o [path]  Saves the graph to [path].\n' \
-               % (sys.argv[0], sys.argv[0])
+    def add_arguments(self, parser):
+        pass
 
-    def do_plot(self, plt, fig, db):
+    def do_plot(self, plt, fig, db, args):
         raise NotImplementedError

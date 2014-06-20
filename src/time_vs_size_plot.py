@@ -5,7 +5,7 @@ import plot
 
 class TimeVsSizePlot(plot.Plot):
 
-    def do_plot(self, plt, fig, db):
+    def do_plot(self, plt, fig, db, args):
         statistics = db.get_statistics_by_size()
         data = statistics.items()
         data.sort()
