@@ -1,5 +1,8 @@
-PLOTS=tex/time_vs_size.pdf tex/time_vs_delay_and_loss_probability.pdf tex/retransmissions_vs_delay_and_loss_probability.pdf
-DB=experiments.db
+DB = experiments.db
+PLOTS = tex/time_vs_size.pdf \
+        tex/time_vs_delay_and_loss_probability.pdf \
+        tex/retransmissions_vs_delay_and_loss_probability.pdf
+
 .PHONY: all clean new
 
 all: informe.pdf
