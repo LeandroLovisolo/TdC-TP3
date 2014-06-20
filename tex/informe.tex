@@ -197,7 +197,15 @@ Esto ocurre independientemente de si se tienen datos en el buffer de salida o no
 \subsection{Simulación de los fenómenos estudiados}
 \label{sec:simulacion-fenomenos}
 
-Pendiente.
+Se modificó la implementación del protocolo para simular cada fenómeno de la siguiente manera:
+
+\begin{description}
+  \item[Latencia:] Se introduce un retraso en el envío de ACKs. Se suspende la ejecución durante cierta cantidad de tiempo inmediatamente antes del envío de los mismos.
+
+  \item[Pérdida de paquetes:] Se descarta el envío de ACKs al azar, con cierta probabilidad.
+\end{description}
+
+Tanto el tiempo de retraso como la probabilidad de pérdida se proveen como parámetros al construir un socket PTC.
 
 
 \subsection{Problemas observados}
