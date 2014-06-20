@@ -139,8 +139,9 @@ Petaccio, Lautaro José & 443/11 & lausuper@gmail.com\\
 \section{Introducción}
 \label{sec:introduccion}
 
-En el presente trabajo analizamos
+Partiendo de la implementación del protocolo de transporte PTC provisto por la cátedra (basado en TCP), se propuso estudiar los mecanismos de control de flujo mediante la extensión de dicho protocolo y la realización de posteriores experimentos.
 
+Las extensiones nos permitieron introducir y controlar anomalías en la comunicación entre un cliente y un servidor. Utilizamos estos agregados para poder realizar los mencionados experimentos, y luego obtener conclusiones sobre la resistencia del protocolo; y por extensión, de TCP.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -258,23 +259,37 @@ Se agrega la clase KeepAliveSender que funcionará como el nuevo thread agregado
 
 \subsection{Tiempo de transferencia en función del tamaño del archivo enviado}
 
-Hay que decir que es lineal, como uno esperaría.
+En la figura \ref{plot:time_vs_size} podemos observar cómo el tiempo de transferencia crece linealmente al incrementar el tamaño del archivo transmitido. Este comportamiento era el esperado, dado que para archivos cada vez más grandes, las transmisiones requieren proporcionalmente más envíos de paquetes para ser completadas.
 
 
 \subsection{Retransmisiones en función del tamaño de archivo enviado}
 
-Decir que no hay correlación.
+Se obtuvo como resultado de los experimentos realizados sobre retransmisión en función de tamaño del archivo que, salvo unos outliers que pueden identificarse en el gráfico \textit{Tiempo de transferencia en función del tamaño de archivo} \ref{plot:retransmissions_vs_size}, la cantidad de retransmisión se mantiene estable en promedio. Puede observarse más detalladamente en el segundo gráfico, \textit{Tiempo de transferencia en función del tamaño de archivo, excluyendo outliers} \ref{plot:retransmissions_vs_size_wo_outliers}, del cuál, como el nombre lo indica, fueron eliminados los outliers (retransmisiones eran mayores a 10), que el promedio de retransmisiones cumple con lo dicho.
 
+Suponemos que esto es debido a que, como la pérdida se realiza sobre el primer ACK que envía el servidor al recibir los datos, y como en la experimentación, el servidor está continuamente leyendo datos, la lectura rápida del servidor hará que la ventana de recepción del servidor se libere rápidamente, enviando el ACK que informa la nueva ventana el cuál reemplazará al ACK anterior, sin necesidad de realizar retransmisión por parte del cliente.
 
 \subsection{Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
 
-Decir que el tiempo disminuye a medida que la probabilidad de pérdida aumenta.
+En este resultado hay varios fenómenos interesantes para notar. En principio para todas las probabilidades de pérdida probadas se detecta un crecimiento lineal en el tiempo de transmisión, lo cual es coherente con el incremento en el delay forzado de los ACKs.
+
+Pero algo aún más interesante es el hecho de que los tiempos exhibidos en las pruebas son menores a medida que se incrementa la probabilidad de pérdida introducida. Este resultado es una noción anti-intuitiva, puesto que podría creerse que al perderse más ACKs se incrementaría la cantidad de retransmisiones de paquetes. Como se verá más adelante (\ref{sec:retr_vs_delay_and_loss}), esto no ocurre.
+
+El motivo por el cual se da este fenómeno no nos es claro, pero consideramos como una hipótesis el siguiente comportamiento:
+
+\begin{itemize}
+  \item El cliente envía el buffer al servidor.
+  \item El servidor, con probabilidad $p$, envía un ACK e indica tamaño de ventana actual.
+  \item El cliente continúa envíando paquetes hasta que se termine de transmitir el archivo o el tamaño de ventana comunicado por el servidor sea 0, momento en el cual detiene la transmisión hasta que se libere dicho tamaño de ventana.
+\end{itemize}
+
+Al incrementar $p$, esto último ocurre con menor frecuencia, por lo que el cliente continúa enviando paquetes al servidor, y retransmitiendo cuando sea necesario. Como el cliente nunca se bloquea por tamaño de ventana nulo, no existen tiempos ociosos en el proceso de transmisión, o lo que es lo mismo, logra mantenerse el canal de comunicación lo más lleno posible, logrando con ello la reducción del tiempo de transmisión del archivo.
 
 
-\subsection{Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
+\subsection{Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs} \label{sec:retr_vs_delay_and_loss}
 
-Decir que no hay correlación.
+Observamos en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability} y también en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers} del cúal fueron removidos los outliers (experimentos con 5 o más retransmisiones), que a mayor retraso del envío del ACK al recibir datos por parte del servidor, la cantidad de retransmisiones es, en promedio, estable.
 
+Suponemos que este fenómeno ocurre debido a que, al aplicar delay al ACK que es enviado automáticamente al recibir datos desde el servidor, y como el servidor lee continuamente del buffer de recepción, liberando su receiving windw rápidamente, el ACK con delay es suplantado por el ACK que envía el servidor al liberar su recieving window, haciendo que más tarde, el ACK enviado con delay sea descartado por el cliente el cúal ya habría recibido el ACK con la adviced window liberada haciendo que la necesidad de retransmisión fuera descartada.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Conclusión                                                                %%
