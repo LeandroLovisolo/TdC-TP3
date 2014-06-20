@@ -230,13 +230,20 @@ No se encontró la causa de este problema. Sin embargo esta situación dejó de 
 
 
 \subsubsection{Error \texttt{[Errno 90] Message too long} causado por \emph{maximum segment size} demasiado grande}
+\label{sec:error-mss}
 
-Pendiente.
+Este error ocurría porque por algún motivo cuya causa no se logró identificar, el método \\ \texttt{PTCControlBlock\#usable\_window\_size()} devolvía un tamaño efectivo de ventana de emisión muy grande, que producía que se enviaran paquetes PTC de tamaño superior al de la MTU de Ethernet.
+
+Se logró evitar este problema modificando el valor de la constante \texttt{MSS}, que indica el tamaño máximo de segmento, de forma tal que los paquetes creados nunca superen el tamaño de la MTU.
 
 
 \subsubsection{Crecimiento del tamaño de la ventana de recepción a medida que pasa el tiempo}
 
-Pendiente.
+Ocurría que, durante la transmisión de un archivo entre dos hosts por medio de sockets PTC, la ventana de recepción del host que recibía el archivo eventualmente superaba su tamaño inicial y se incrementaba a medida que pasaba el tiempo. No se logró identificar la causa de este problema, pero se sospecha que se trata de un bug de sincronismo entre threads.
+
+Se evitó la ocurrencia de este fenómeno modificando el bloque de control de forma de memorizar el tamaño inicial de la ventana de recepción, y utilizarlo como valor máximo en el método \\ \texttt{PTCControlBlock\#from\_in\_buffer(size)}, que extrae bytes del buffer de recepción e incrementa la ventana de recepción en función de la cantidad de bytes extraídos.
+
+Luego de efectuar este parche, se conjeturó que el error explicado en \ref{sec:error-mss} se producía porque el interlocutor eventualmente recibía un tamaño de ventana de recepción que producía paquetes que superaban la MTU de Ethernet.
 
 
 \subsubsection{\emph{Deadlock} por recepción de paquete con ventana nula}
