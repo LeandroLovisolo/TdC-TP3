@@ -276,7 +276,7 @@ Se agrega la clase KeepAliveSender que funcionará como el nuevo thread agregado
 \section{Resultados}
 \label{sec:resultados}
 
-\subsection{Delay y probabilidad de pérdida fijas; tamaño variable}
+\subsection{Distintos tamaños, sin retraso ni pérdida de ACKs}
 
 \grafico{time_vs_size}
         {Tiempo de transferencia en función del tamaño de archivo}
@@ -286,12 +286,14 @@ Se agrega la clase KeepAliveSender que funcionará como el nuevo thread agregado
         {Retransmisiones en función del tamaño de archivo}
         {plot:retransmissions_vs_size}
 
+Aquí excluimos los outliers para poder tener otra visión sobre el resultado.
+
 \grafico{retransmissions_vs_size_wo_outliers}
         {Retransmisiones en función del tamaño de archivo, excluyendo outliers}
         {plot:retransmissions_vs_size_wo_outliers}
 
 
-\subsection{Tamaño fijo; delay y probabilidad de pérdida variables}
+\subsection{Tamaño fijo, distintos delays y probabilidades de pérdida de ACKs}
 
 \grafico{time_vs_delay_and_loss_probability}
         {Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
@@ -300,6 +302,8 @@ Se agrega la clase KeepAliveSender que funcionará como el nuevo thread agregado
 \grafico{retransmissions_vs_delay_and_loss_probability}
         {Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
         {plot:retransmissions_vs_delay_and_loss_probability}
+
+Aquí también excluimos los outliers para poder tener otra visión sobre el resultado.
 
 \grafico{retransmissions_vs_delay_and_loss_probability_wo_outliers}
         {Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs, excluyendo outliers}
