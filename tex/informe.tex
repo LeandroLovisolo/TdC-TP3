@@ -147,7 +147,7 @@ Petaccio, Lautaro José & 443/11 & lausuper@gmail.com\\
 \label{sec:introduccion}
 
 
-En el presente trabajo se estudia el desempeño del protocolo PTC\footnote{Protocolo desarrollado por la cátedra del curso \textit{Teoría de las Comunicaciones} dictado por el Departamento de Computación de la Universidad de Buenos Aires.} ante algunos fenómenos típicos de una red de área local. El protocolo PTC es un protocolo educacional de capa de transporte que implementa la técnica de ventana deslizante. Los fenómenos estudiados son la latencia y la pérdida de paquetes.
+En el presente trabajo se estudia el desempeño del protocolo PTC\footnote{Protocolo desarrollado por la cátedra del curso \emph{Teoría de las Comunicaciones} dictado por el Departamento de Computación de la Universidad de Buenos Aires.} ante algunos fenómenos típicos de una red de área local. El protocolo PTC es un protocolo educacional de capa de transporte que implementa la técnica de ventana deslizante. Los fenómenos estudiados son la latencia y la pérdida de paquetes.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -179,12 +179,12 @@ Cuando la conexión está en estado \established y se recibe un paquete con payl
 A su vez, en el caso que se almacenan bytes en el buffer de recepción, la implementación notifica al interlocutor enviando un paquete cuyo campo \ack tiene el valor del número de secuencia del próximo byte que se espera recibir y cuyo campo \window indica el nuevo tamaño de la ventana de recepción. Esto puede ocurrir de dos maneras distintas:
 
 \begin{itemize}
-  \item Cuando hay datos en el buffer de emisión, se aprovecha el envío del próximo paquete con datos al interlocutor (caso conocido como \textit{piggybacking}.)
+  \item Cuando hay datos en el buffer de emisión, se aprovecha el envío del próximo paquete con datos al interlocutor (caso conocido como \emph{piggybacking}.)
 
   \item Cuando el buffer de emisión está vacío, se envía un paquete sin payload con el único propósito que el interlocutor reciba los valores de los campos \ack y \window.
 \end{itemize}
 
-La acción de enviar un paquete sin payload con el único propósito de comunicar la recepción de un paquete proveniente del interlocutor se refiere de ahora en más como \textit{envío de ACK}.
+La acción de enviar un paquete sin payload con el único propósito de comunicar la recepción de un paquete proveniente del interlocutor se refiere de ahora en más como \emph{envío de ACK}.
 
 
 \subsubsection{Envío de ventana actualizada}
@@ -211,13 +211,52 @@ Tanto el tiempo de retraso como la probabilidad de pérdida se proveen como par�
 \subsection{Problemas observados}
 \label{sec:problemas-observados}
 
+Luego de introducir los cambios explicados en \ref{sec:simulacion-fenomenos}, se observaron algunos problemas durante la fase de experimentación que interferían con la correcta ejecución de los experimentos. Estos problemas en algunos casos fueron solucionados y en otros evitados implementando \emph{workarounds}. Explicamos los mismos a continuación.
+
+
+\subsubsection{Error \texttt{[Errno 90] Message too long} causado por error de cálculo en bloque de control}
+
+Se producía dicho error al intentar enviar un paquete con tamaño mayor a la MTU de Ethernet por medio del socket raw en la clase \texttt{Soquete}.
+
+Este error ocurría porque, bajo ciertas circunstancias, el método \texttt{PTCControlBlock\#usable\_window\_size()} devolvía un valor negativo pequeño.
+
+El valor devuelto por el método anterior representa la cantidad efectiva de bytes del buffer de emisión que se pueden enviar sin inundar al interlocutor. Dicho valor se emplea en el método \\ \texttt{PTCControlBlock\#extract\_from\_out\_buffer(size)} para extraer esa cantidad de bytes del buffer de emisión invocando al método \texttt{DataBuffer\#get(size)}, que recibe dicho valor como parámetro. Luego, los bytes extraídos del buffer se empaquetan como payload de un paquete PTC, y éste se envía al interlocutor. 
+
+En circunstancias normales, el método \texttt{DataBuffer\#get(size)} extrae los primeros \texttt{size} bytes de una lista que contiene los bytes del buffer (tipo de dato \texttt{list} en Python.)
+
+En el caso en el que ocurría el error, dicho método intentaba extraer una cantidad negativa de bytes del buffer, que debido a la semántica de las operaciones con índices en listas en Python, se interpretaba como la extracción de todos los bytes desde la posición 0 hasta \texttt{size} posiciones antes del final de la lista. Además, el buffer almacenaba cientos de miles de bytes al momento de producirse el error. Lo que ocurría finalmente es que se extraía una cantidad de bytes igual al número de bytes en el buffer menos el valor absoluto de \texttt{size}, que como este último era un valor pequeño, resultaba en el orden de los cientos de miles. Cuando luego se intentaba enviar un paquete PTC con un payload de tal tamaño, se producía el error \texttt{[Errno 90] Message too long}, pues la trama Ethernet resultante era de un tamaño muy superior a la MTU de Ethernet, que es de 1500 bytes.
+
+No se encontró la causa de este problema. Sin embargo esta situación dejó de ocurrir luego de parchear el método \texttt{PTCControlBlock\#usable\_window\_size()} de forma que devolviera 0 en caso que el cálculo de ventana efectiva resultara negativo.
+
+
+\subsubsection{Error \texttt{[Errno 90] Message too long} causado por \emph{maximum segment size} demasiado grande}
+\label{sec:error-mss}
+
+Este error ocurría porque por algún motivo cuya causa no se logró identificar, el método \\ \texttt{PTCControlBlock\#usable\_window\_size()} devolvía un tamaño efectivo de ventana de emisión muy grande, que producía que se enviaran paquetes PTC de tamaño superior al de la MTU de Ethernet.
+
+Se logró evitar este problema modificando el valor de la constante \texttt{MSS}, que indica el tamaño máximo de segmento, de forma tal que los paquetes creados nunca superen el tamaño de la MTU.
+
+
+\subsubsection{Crecimiento del tamaño de la ventana de recepción a medida que pasa el tiempo}
+
+Ocurría que, durante la transmisión de un archivo entre dos hosts por medio de sockets PTC, la ventana de recepción del host que recibía el archivo eventualmente superaba su tamaño inicial y se incrementaba a medida que pasaba el tiempo. No se logró identificar la causa de este problema, pero se sospecha que se trata de un bug de sincronismo entre threads.
+
+Se evitó la ocurrencia de este fenómeno modificando el bloque de control de forma de memorizar el tamaño inicial de la ventana de recepción, y utilizarlo como valor máximo en el método \\ \texttt{PTCControlBlock\#from\_in\_buffer(size)}, que extrae bytes del buffer de recepción e incrementa la ventana de recepción en función de la cantidad de bytes extraídos.
+
+Luego de efectuar este parche, se conjeturó que el error explicado en \ref{sec:error-mss} se producía porque el interlocutor eventualmente recibía un tamaño de ventana de recepción que producía paquetes que superaban la MTU de Ethernet.
+
+
+\subsubsection{\emph{Deadlock} por recepción de paquete con ventana nula}
+
 Pendiente.
 
 
-
 \subsection{Experimentos realizados}
+\label{sec:experimentos}
 
-Se realizó un conjunto de experimentos transmitiendo archivos de distintos tamaños desde un nodo \textit{cliente} hacia un nodo \textit{servidor} utilizando sockets PTC. Los experimentos fueron realizados en el contexto de una red LAN donde el cliente se conectaba a un router Linksys WRT54GL de forma inalámbrica (norma 802.11b), mientras que el servidor se conectaba al mismo router de forma cableada (norma 802.3, velocidad 100 Mbits/s.)
+Los experimentos descritos a continuación fueron realizados con una versión del la implementación de PTC que incorpora tanto las modificaciones para simular los fenómenos estudiados, explicadas en \ref{sec:simulacion-fenomenos}, como las soluciones a los problemas descritos en \ref{sec:problemas-observados}.
+
+Se realizó un conjunto de experimentos transmitiendo archivos de distintos tamaños desde un nodo \emph{cliente} hacia un nodo \emph{servidor} utilizando sockets PTC. Los experimentos fueron realizados en el contexto de una red LAN donde el cliente se conectaba a un router Linksys WRT54GL de forma inalámbrica (norma 802.11b), mientras que el servidor se conectaba al mismo router de forma cableada (norma 802.3, velocidad 100 Mbits/s.)
 
 En los distintos experimentos se hicieron variar el tiempo de retraso de envíos de ACKs y la probabilidad de pérdida de los mismos en el nodo servidor, mientras que en el nodo cliente no se introdujeron retrasos ni pérdidas.
 
