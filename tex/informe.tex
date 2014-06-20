@@ -349,7 +349,7 @@ Se agrega la clase KeepAliveSender que funcionará como el nuevo thread agregado
 \section{Resultados}
 \label{sec:resultados}
 
-\subsection{Distintos tamaños, sin retraso ni pérdida de ACKs}
+\subsection{Distintos tamaños de archivo, sin retraso ni pérdida de ACKs}
 
 \grafico{time_vs_size}
         {Tiempo de transferencia en función del tamaño de archivo}
@@ -366,7 +366,7 @@ Como puede verse, existen algunos outliers que consideramos que afectan el cálc
         {plot:retransmissions_vs_size_wo_outliers}
 
 
-\subsection{Tamaño fijo, distintos delays y probabilidades de pérdida de ACKs}
+\subsection{Tamaño de archivo fijo, distintos tiempos de retraso y probabilidades de pérdida de ACKs}
 
 \grafico{time_vs_delay_and_loss_probability}
         {Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
@@ -403,20 +403,22 @@ Se obtuvo como resultado de los experimentos realizados sobre retransmisión en 
 
 Este resultado no fue el que esperábamos, ya que al incrementar la cantidad de datos enviados, esperaríamos obtener una cantidad mayor de retransmisiones, siguiendo la idea intuitiva de que en un uso prolongado se repetirían las retransmisiones.
 
+
 \subsection{Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
 
-Observamos en la figura \ref{plot:time_vs_delay_and_loss_probability} dos resultados interesantes. Primero, mientras mayor es el delay de envío de ACKs, mayor es el tiempo total de transferencia del archivo, y segundo, a mayor probabilidad de pérdida de paquetes de ACKs, menor el tiempo de transferencia. Estos resultados resultan contraintuitivoss en relación a nuestro análisis del código. 
+Observamos en la figura \ref{plot:time_vs_delay_and_loss_probability} dos resultados interesantes. Primero, mientras mayor es el tiempo de retraso de envío de ACKs, mayor es el tiempo total de transferencia del archivo, y segundo, a mayor probabilidad de pérdida de paquetes de ACKs, menor el tiempo de transferencia. Estos resultados resultan contraintuitivoss en relación a nuestro análisis del código. 
 
-Nuestra suposición sobre los resultados a obtener concluía en que, el delay y la pérdida de paquetes, únicamente influyentes en el envío del ACK que se realiza al recibir datos, no afectaría el tiempo de transmisión total debido a que, como en nuestros experimentos el servidor está continuamente leyendo datos del buffer de recepción, instantáneamente después de haber recibido los datos, el servidor los leería (ya que actúa independientemente de la recepción de paquetes) y mandaría el ACK relacionado a la liberación de memoria del buffer, haciendo que el primer ACK (el ACK al recibir datos) no influyera en el tiempo en el que el cliente pueda enviar datos nuevamente debido a que el mismo ya habría recibido la confirmación de la llegada de sus datos con el ACK relacionado al cambio de tamaño de ventana mencionado anteriormente.
+Nuestra suposición sobre los resultados a obtener concluía en que, el tiempo de retraso y la pérdida de paquetes, únicamente influyentes en el envío del ACK que se realiza al recibir datos, no afectaría el tiempo de transmisión total debido a que, como en nuestros experimentos el servidor está continuamente leyendo datos del buffer de recepción, instantáneamente después de haber recibido los datos, el servidor los leería (ya que actúa independientemente de la recepción de paquetes) y mandaría el ACK relacionado a la liberación de memoria del buffer, haciendo que el primer ACK (el ACK al recibir datos) no influyera en el tiempo en el que el cliente pueda enviar datos nuevamente debido a que el mismo ya habría recibido la confirmación de la llegada de sus datos con el ACK relacionado al cambio de tamaño de ventana mencionado anteriormente.
 
-Nuestra suposición sobre los resultados observados era que podría llegar a existir algún problema a nivel de implementación, donde los threads que se utilizan estuvieran sufriendo algún lock que dependiera del delay introducido para la experimentación al enviar el ACK, pero nuestro análisis del código descartó la hipótesis dejándonos sin explicación para el fenómeno.
+Nuestra suposición sobre los resultados observados era que podría llegar a existir algún problema a nivel de implementación, donde los threads que se utilizan estuvieran sufriendo algún lock que dependiera del tiempo de retraso introducido para la experimentación al enviar el ACK, pero nuestro análisis del código descartó la hipótesis dejándonos sin explicación para el fenómeno.
 
 
 \subsection{Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs} \label{sec:retr_vs_delay_and_loss}
 
 Observamos en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability} y también en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers} del cúal fueron removidos los outliers (experimentos con 5 o más retransmisiones), que a mayor retraso del envío del ACK al recibir datos por parte del servidor, la cantidad de retransmisiones es, en promedio, estable.
 
-Suponemos que este fenómeno ocurre debido a que, al aplicar delay al ACK que es enviado automáticamente al recibir datos desde el servidor, y como el servidor lee continuamente del buffer de recepción, liberando su receiving windw rápidamente, el ACK con delay es suplantado por el ACK que envía el servidor al liberar su recieving window, haciendo que más tarde, el ACK enviado con delay sea descartado por el cliente el cúal ya habría recibido el ACK con la adviced window liberada haciendo que la necesidad de retransmisión fuera descartada.
+Suponemos que este fenómeno ocurre debido a que, al aplicar tiempo de retraso al ACK que es enviado automáticamente al recibir datos desde el servidor, y como el servidor lee continuamente del buffer de recepción, liberando su receiving windw rápidamente, el ACK con tiempo de retraso es suplantado por el ACK que envía el servidor al liberar su recieving window, haciendo que más tarde, el ACK enviado con tiempo de retraso sea descartado por el cliente el cúal ya habría recibido el ACK con la adviced window liberada haciendo que la necesidad de retransmisión fuera descartada.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Conclusión                                                                %%
@@ -429,12 +431,16 @@ El protocolo PTC, como originalmente fue provisto, contenía una serie de proble
 
 \begin{itemize}
   \item El tiempo de transmisión aumenta linealmente en relación al tamaño del archivo a enviar.
+
   \item No es posible encontrar una correlación entre la cantidad de retransmisiones y el tamaño de los archivos enviados.
+
   \item A mayor pérdida de paquetes ACK por datos recibidos, menor tiempo de transmisión de datos.
-  \item A mayor delay de paquetes ACK por datos recibidos, mayor tiempo de transmisión de datos.
+
+  \item A mayor tiempo de retraso de paquetes ACK por datos recibidos, mayor tiempo de transmisión de datos.
 \end{itemize}
 
 Obviando la primera conclusión propuesta resultante de la experimentación, las demás conclusiones obtenidas no pudieron ser explicadas ya que no fueron encontrados relaciones algunas con la implementación o el uso de la red.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Trabajo futuro                                                            %%
@@ -444,10 +450,13 @@ Obviando la primera conclusión propuesta resultante de la experimentación, las
 \section{Trabajo futuro}
 
 Panteamos como trabajo futuro:
+
 \begin{itemize}
-\item Una vez corregidos completamente los errores descriptos, realizar nuevamente la experimentación propuesta.
-\item Realizar un test más exhaustivo sobre otras anomalías que pudieran existir en una comunicación utilizandose el protocolo, por ejemplo, la pérdida de paquetes y delays en los ACK utilizados para notificar un cambio de ventana al liberar datos del buffer de recepción.
+  \item Una vez corregidos completamente los errores descriptos, realizar nuevamente la experimentación propuesta.
+
+  \item Realizar un test más exhaustivo sobre otras anomalías que pudieran existir en una comunicación utilizandose el protocolo, por ejemplo, la pérdida de paquetes y tiempos de retraso en los ACK utilizados para notificar un cambio de ventana al liberar datos del buffer de recepción.
 \end{itemize}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Referencias                                                               %%
