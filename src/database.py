@@ -45,7 +45,12 @@ class DB:
                          VALUES (?, ?, ?, ?, ?, ?)''',
                       (experiment_id, time, retx, size, delay, loss))
 
-    def get_statistics_by_size(self):
+    def get_statistics_by_size(self, exclude_outliers=False):
+        if exclude_outliers:
+            max_retx = 10
+        else:
+            max_retx = sys.maxint
+
         with self as c:
             experiment_id = self.get_experiment_id(DB.SIZE)
 
@@ -57,7 +62,9 @@ class DB:
             statistics = {}
             for size in sizes:
                 c.execute('''SELECT avg(time), avg(retx) FROM records WHERE
-                             experiment_id = ? AND size = ?''', (experiment_id, size))
+                             experiment_id = ? AND
+                             retx <= ? AND
+                             size = ?''', (experiment_id, max_retx, size))
                 row = c.fetchone()
                 time = row[0]
                 retransmissions = row[1]
