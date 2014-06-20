@@ -1,15 +1,16 @@
 PLOTS=tex/time_vs_size.pdf tex/time_vs_delay_and_loss_probability.pdf tex/retransmissions_vs_delay_and_loss_probability.pdf
+DB=experiments.db
 .PHONY: all clean new
 
 all: informe.pdf
 
-tex/time_vs_size.pdf:
+tex/time_vs_size.pdf: $(DB) src/time_vs_size_plot.py
 	./time_vs_size_plot -o tex/time_vs_size.pdf
 
-tex/time_vs_delay_and_loss_probability.pdf:
+tex/time_vs_delay_and_loss_probability.pdf: $(DB) src/time_vs_delay_and_loss_probability_plot.py
 	./time_vs_delay_and_loss_probability_plot -o tex/time_vs_delay_and_loss_probability.pdf
 
-tex/retransmissions_vs_delay_and_loss_probability.pdf:
+tex/retransmissions_vs_delay_and_loss_probability.pdf: $(DB) src/retransmissions_vs_delay_and_loss_probability_plot.py
 	./retransmissions_vs_delay_and_loss_probability_plot -o tex/retransmissions_vs_delay_and_loss_probability.pdf
 
 informe.pdf: tex/informe.tex $(PLOTS)
