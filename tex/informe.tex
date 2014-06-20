@@ -139,9 +139,8 @@ Petaccio, Lautaro José & 443/11 & lausuper@gmail.com\\
 \section{Introducción}
 \label{sec:introduccion}
 
-Partiendo de la implementación del protocolo de transporte PTC provisto por la cátedra (basado en TCP), se propuso extenderlo para poder introducir y controlar anomalías en la comunicación entre un cliente y un servidor.
 
-Utilizamos estos agregados para poder realizar experimentos con el protocolo y analizar el impacto de las anomalías introducidas. Posteriormente establecemos conclusiones sobre la resistencia y performance de PTC, y por extensión, de TCP.
+En el presente trabajo se estudia el desempeño del protocolo PTC\footnote{Protocolo desarrollado por la cátedra del curso \textit{Teoría de las Comunicaciones} dictado por el Departamento de Computación de la Universidad de Buenos Aires.} ante algunos fenómenos típicos de una red de área local. El protocolo PTC es un protocolo educacional de capa de transporte que implementa la técnica de ventana deslizante. Los fenómenos estudiados son la latencia y la pérdida de paquetes.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -152,9 +151,11 @@ Utilizamos estos agregados para poder realizar experimentos con el protocolo y a
 \section{Desarrollo}
 \label{sec:desarrollo}
 
-Se modificó el stack PTC provisto por la cátedra de manera de poder demorar el envío de ACKs y de simular la pérdida de los mismos según un tiempo de demora y una probabilidad de pérdida especificadas al momento de crear un socket PTC.
+Se partió de una implementación del protocolo PTC\footnote{Esta implementación fue provista por la cátedra.} a la que se le introdujeron modificaciones para simular los fenómenos estudiados. Luego se realizaron experimentos para medir cómo impactan en el desempeño del protocolo estos fenómenos simulados.
 
+\subsection{Envío de ACKs}
 
+Pendiente
 
 
 
@@ -177,7 +178,7 @@ Se transmitieron archivos de tamaños siguiendo la secuencia 50 KB, 100 KB, 150K
 Se transmitieron 10 archivos de 50 KB para cada par de tiempo de retraso y probabilidad de pérdida de ACKs según las secuencias a continuación:
 
 \begin{itemize}
-  \item Tiempos de retraso en envío de ACKs:  0 ms, 5 ms, 10 ms, 15 ms, \ldots, 95 ms, 100 ms.
+  \item Tiempos de retraso de envío de ACKs:  0 ms, 5 ms, 10 ms, 15 ms, \ldots, 95 ms, 100 ms.
   \item Probabilidades de pérdida de ACKs: 0, 0.05, 0.1, 0.15, \ldots, 0.45, 0.5.
 \end{itemize}
 
