@@ -189,7 +189,9 @@ La acción de enviar un paquete sin payload con el único propósito de comunica
 
 \subsubsection{Envío de ventana actualizada}
 
-Pendiente.
+Cuando se leen datos del buffer de recepción, se libera el espacio del buffer previamente ocupado por los datos leídos y se aumenta la ventana de recepción proporcionalmente. Luego se envía al interlocutor un paquete sin payload con el único propósito de comunicar el nuevo valor de la ventana de recepción (campo \window.)
+
+Esto ocurre independientemente de si se tienen datos en el buffer de salida o no.
 
 
 \subsection{Simulación de los fenómenos estudiados}
