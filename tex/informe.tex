@@ -152,6 +152,11 @@ Las extensiones nos permitieron introducir y controlar anomalías en la comunica
 \section{Desarrollo}
 \label{sec:desarrollo}
 
+Se modificó el stack PTC provisto por la cátedra de manera de poder demorar el envío de ACKs y de simular la pérdida de los mismos según un tiempo de demora y una probabilidad de pérdida especificadas al momento de crear un socket PTC.
+
+
+
+
 
 \subsection{Experimentos realizados}
 
@@ -186,7 +191,7 @@ Para cada transmisión se registró el tiempo total de transmisión y la cantida
 \subsection{Cambios en el código}
 Realizamos modificaciones en el código original con el objetivo de arreglar ciertos problemas que encontramos en el transcurso de la experimentación y poder realizar
 el registro de eventos interesantes para la experimentación.
-
+s
 A continuación, detallaremos los cambios realizados por archivos.
 
 \subsubsection{cblock.py}
@@ -214,6 +219,7 @@ La clase soquete percibe cambios para el registro de errores, en especial el pro
 
 \subsubsection{thread.py}
 Se agrega la clase KeepAliveSender que funcionará como el nuevo thread agregado para poder solucionar el problema en el que la recepción de una adviced window 0 hace que ambos, receptor y emisor queden esperando la recepción de datos. La función do\_run() de la clase es la encargada de enviar en intervalos, los paquetes keep alive para poder recibir la nueva advice window del receptor.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Resultados                                                                %%
