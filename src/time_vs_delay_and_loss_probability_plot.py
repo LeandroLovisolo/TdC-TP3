@@ -6,8 +6,8 @@ import plot
 class TimeVsDelayAndLossProbabilityPlot(plot.Plot):
 
     def do_plot(self, plt, fig, db, args):
-        colors = ['Green', 'DarkCyan', 'Indigo', 'Brown', 'DarkGoldenRod', 'Crimson',
-                  'Orange', 'GreenYellow', 'DarkMagenta', 'MidnightBlue', 'DimGray']
+        colors = ['Green', 'DarkCyan', 'Fuchsia', 'Brown', 'DarkGoldenRod', 'Salmon',
+                  'Orange', 'GreenYellow', 'Red', 'MidnightBlue', 'DimGray']
         loss_probabilities = db.get_loss_probabilities()
 
         for loss in loss_probabilities:
