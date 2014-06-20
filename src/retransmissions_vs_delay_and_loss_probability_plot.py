@@ -27,6 +27,7 @@ class RetransmissionsVsDelayAndLossProbabilityPlot(plot.Plot):
         plt.title(u'Cantidad de retransmisiones en función del retraso en envío de ACKs')
         plt.xlabel(u'Retraso en envío de ACKs (ms)')
         plt.ylabel(u'Retransmisiones')
+        plt.legend(loc=2, title=u"Probabilidad de\npérdida de ACKs")
 
     def add_arguments(self, parser):
         parser.add_argument('--exclude-outliers', action='store_true')
