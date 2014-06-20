@@ -248,7 +248,7 @@ Luego de efectuar este parche, se conjeturó que el error explicado en \ref{sec:
 
 \subsubsection{\emph{Deadlock} por recepción de paquete con ventana nula}
 
-En alagunas ocasiones, sucedía durante la transmisión de un archivo entre dos hosts por medio de sockets PTC que el host emisor recibía un paquete con ventana nula, y luego no recibía más paquetes del host receptor. Esto producía que el host emisor quedara perpetuamente a la espera de un paquete con ventana no-nula proveniente del receptor para poder continuar la comunicación, y esto nunca ocurría.
+En algunas ocasiones, sucedía durante la transmisión de un archivo entre dos hosts por medio de sockets PTC que el host emisor recibía un paquete con ventana nula, y luego no recibía más paquetes del host receptor. Esto producía que el host emisor quedara perpetuamente a la espera de un paquete con ventana no-nula proveniente del receptor para poder continuar la comunicación, y esto nunca ocurría.
 
 La siguiente es una sucesión de eventos típicas que producía este problema:
 
