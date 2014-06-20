@@ -10,22 +10,22 @@ PLOTS = tex/time_vs_size.pdf \
 
 all: informe.pdf
 
-tex/time_vs_size.pdf: $(DB) src/time_vs_size_plot.py
+tex/time_vs_size.pdf: $(DB) src/plot.py src/time_vs_size_plot.py
 	./time_vs_size_plot -o tex/time_vs_size.pdf
 
-tex/retransmissions_vs_size.pdf: $(DB) src/retransmissions_vs_size_plot.py
+tex/retransmissions_vs_size.pdf: $(DB) src/plot.py src/retransmissions_vs_size_plot.py
 	./retransmissions_vs_size_plot -o tex/retransmissions_vs_size.pdf
 
-tex/retransmissions_vs_size_wo_outliers.pdf: $(DB) src/retransmissions_vs_size_plot.py
+tex/retransmissions_vs_size_wo_outliers.pdf: $(DB) src/plot.py src/retransmissions_vs_size_plot.py
 	./retransmissions_vs_size_plot --exclude-outliers -o tex/retransmissions_vs_size_wo_outliers.pdf
 
-tex/time_vs_delay_and_loss_probability.pdf: $(DB) src/time_vs_delay_and_loss_probability_plot.py
+tex/time_vs_delay_and_loss_probability.pdf: $(DB) src/plot.py src/time_vs_delay_and_loss_probability_plot.py
 	./time_vs_delay_and_loss_probability_plot -o tex/time_vs_delay_and_loss_probability.pdf
 
-tex/retransmissions_vs_delay_and_loss_probability.pdf: $(DB) src/retransmissions_vs_delay_and_loss_probability_plot.py
+tex/retransmissions_vs_delay_and_loss_probability.pdf: $(DB) src/plot.py src/retransmissions_vs_delay_and_loss_probability_plot.py
 	./retransmissions_vs_delay_and_loss_probability_plot -o tex/retransmissions_vs_delay_and_loss_probability.pdf
 
-tex/retransmissions_vs_delay_and_loss_probability_wo_outliers.pdf: $(DB) src/retransmissions_vs_delay_and_loss_probability_plot.py
+tex/retransmissions_vs_delay_and_loss_probability_wo_outliers.pdf: $(DB) src/plot.py src/retransmissions_vs_delay_and_loss_probability_plot.py
 	./retransmissions_vs_delay_and_loss_probability_plot --exclude-outliers -o tex/retransmissions_vs_delay_and_loss_probability_wo_outliers.pdf
 
 informe.pdf: tex/informe.tex $(PLOTS)

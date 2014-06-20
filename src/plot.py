@@ -8,6 +8,7 @@ from database import DB
 
 
 class Plot:
+
     def __init__(self):
         parser = argparse.ArgumentParser()
         parser.add_argument('-o', '--output-path', help='path on which to save the plot')
@@ -24,6 +25,7 @@ class Plot:
                              'axes.titlesize':     10})
 
         fig = plt.figure()
+        fig.set_size_inches(6, 4) 
 
         db = DB()
         self.do_plot(plt, fig, db, args)

@@ -24,7 +24,7 @@
 %%%%%%%%%% Configuración de Fancyhdr - Inicio %%%%%%%%%%
 \pagestyle{fancy}
 \thispagestyle{fancy}
-\lhead{Trabajo Práctico 2 · Teoría de las Comunicaciones}
+\lhead{Trabajo Práctico 3 · Teoría de las Comunicaciones}
 \rhead{Delgado · Lovisolo · Petaccio}
 \renewcommand{\footrulewidth}{0.4pt}
 \cfoot{\thepage /\pageref{LastPage}}
@@ -55,19 +55,6 @@
 %%%%%%%%%% Miscelánea - Fin %%%%%%%%%%
 
 
-%%%%%%%%%% Insertar estadísticas - Inicio %%%%%%%%%%
-\newcommand{\estadisticas}[3]{
-  \begin{figure}[H]
-    \small
-    \verbatiminput{#1}
-    \normalsize
-    \caption{#2}
-    \label{#3}
-  \end{figure}
-}
-%%%%%%%%%% Insertar estadísticas - Fin %%%%%%%%%%
-
-
 %%%%%%%%%% Insertar gráfico - Inicio %%%%%%%%%%
 \newcommand{\grafico}[3]{
   \begin{figure}[H]
@@ -77,13 +64,6 @@
   \end{figure}
 }
 %%%%%%%%%% Insertar gráfico - Fin %%%%%%%%%%
-
-
-%%%%%%%%%% Nombres de las universidades - Inicio %%%%%%%%%%
-\newcommand{\oxford}{University of Oxford}
-\newcommand{\sydney}{The University of Sydney}
-\newcommand{\must}{Malaysia University of Science and Technology}
-%%%%%%%%%% Nombres de las universidades - Fin %%%%%%%%%%
 
 
 \begin{document}
@@ -210,8 +190,33 @@ Se agrega la clase KeepAliveSender que funcionará como el nuevo thread agregado
 \section{Resultados}
 \label{sec:resultados}
 
+\grafico{time_vs_size}
+        {Tiempo de transferencia en función del tamaño de archivo}
+        {plot:time_vs_size}
+
+\grafico{retransmissions_vs_size}
+        {Retransmisiones en función del tamaño de archivo}
+        {plot:retransmissions_vs_size}
+
+\grafico{retransmissions_vs_size_wo_outliers}
+        {Retransmisiones en función del tamaño de archivo, excluyendo outliers}
+        {plot:retransmissions_vs_size_wo_outliers}
+
+\grafico{time_vs_delay_and_loss_probability}
+        {Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
+        {plot:time_vs_delay_and_loss_probability}
+
+\grafico{retransmissions_vs_delay_and_loss_probability}
+        {Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
+        {plot:retransmissions_vs_delay_and_loss_probability}
+
+\grafico{retransmissions_vs_delay_and_loss_probability_wo_outliers}
+        {Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs, excluyendo outliers}
+        {plot:retransmissions_vs_delay_and_loss_probability_wo_outliers}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Discusión                      			                     %%
+%% Discusión                      			                                     %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

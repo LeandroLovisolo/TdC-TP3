@@ -4,6 +4,9 @@ tex/*.log
 tex/*.toc
 tex/*.out
 
+# Informe y gráficos
+*.pdf
+
 # Sublime Text
 *.sublime-project
 *.sublime-workspace
