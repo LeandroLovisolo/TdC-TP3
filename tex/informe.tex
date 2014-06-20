@@ -288,7 +288,7 @@ Se agrega la clase KeepAliveSender que funcionará como el nuevo thread agregado
         {Retransmisiones en función del tamaño de archivo}
         {plot:retransmissions_vs_size}
 
-Aquí excluimos los outliers para poder tener otra visión sobre el resultado.
+Como puede verse, existen algunos outliers que consideramos que afectan el cálculo de los promedios. Conforman menos del 3\% del total de registros\footnote{Los registros correspondientes a $retransmisiones \ge 10$}, por lo que para tener otra visión sobre el resultado, decidimos realizar el siguiente gráfico sin esos valores.
 
 \grafico{retransmissions_vs_size_wo_outliers}
         {Retransmisiones en función del tamaño de archivo, excluyendo outliers}
@@ -305,7 +305,7 @@ Aquí excluimos los outliers para poder tener otra visión sobre el resultado.
         {Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
         {plot:retransmissions_vs_delay_and_loss_probability}
 
-Aquí también excluimos los outliers para poder tener otra visión sobre el resultado.
+Como sucedía en la figura \ref{plot:retransmissions_vs_size}, aquí también vemos precencia de outliers que afectan nuestros cálculos. Esta vez son menos del 2\% del total\footnote{Se mantiene el valor 10 como límite de retransmisiones}, así que nuevamente procedemos a realizar una representación sin estos registros.
 
 \grafico{retransmissions_vs_delay_and_loss_probability_wo_outliers}
         {Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs, excluyendo outliers}
