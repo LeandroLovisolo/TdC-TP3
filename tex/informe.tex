@@ -381,19 +381,11 @@ Suponemos que esto es debido a que, como la pérdida se realiza sobre el primer 
 
 \subsection{Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
 
-En este resultado hay varios fenómenos interesantes para notar. En principio para todas las probabilidades de pérdida probadas se detecta un crecimiento lineal en el tiempo de transmisión, lo cual es coherente con el incremento en el delay forzado de los ACKs.
+Observamos en la figura \ref{plot:time_vs_delay_and_loss_probability} dos resultados interesantes. Primero, mientras mayor es el delay de envío de ACKs, mayor es el tiempo total de transferencia del archivo, y segundo, a mayor probabilidad de pérdida de paquetes de ACKs, menor el tiempo de transferencia. Estos resultados resultan contraintuitivoss en relación a nuestro análisis del código. 
 
-Pero algo aún más interesante es el hecho de que los tiempos exhibidos en las pruebas son menores a medida que se incrementa la probabilidad de pérdida introducida. Este resultado es una noción anti-intuitiva, puesto que podría creerse que al perderse más ACKs se incrementaría la cantidad de retransmisiones de paquetes. Como se verá más adelante (\ref{sec:retr_vs_delay_and_loss}), esto no ocurre.
+Nuestra suposición sobre los resultados a obtener concluía en que, el delay y la pérdida de paquetes, únicamente influyentes en el envío del ACK que se realiza al recibir datos, no afectaría el tiempo de transmisión total debido a que, como en nuestros experimentos el servidor está continuamente leyendo datos del buffer de recepción, instantáneamente después de haber recibido los datos, el servidor los leería (ya que actúa independientemente de la recepción de paquetes) y mandaría el ACK relacionado a la liberación de memoria del buffer, haciendo que el primer ACK (el ACK al recibir datos) no influyera en el tiempo en el que el cliente pueda enviar datos nuevamente debido a que el mismo ya habría recibido la confirmación de la llegada de sus datos con el ACK relacionado al cambio de tamaño de ventana mencionado anteriormente.
 
-El motivo por el cual se da este fenómeno no nos es claro, pero consideramos como una hipótesis el siguiente comportamiento:
-
-\begin{itemize}
-  \item El cliente envía el buffer al servidor.
-  \item El servidor, con probabilidad $p$, envía un ACK e indica tamaño de ventana actual.
-  \item El cliente continúa envíando paquetes hasta que se termine de transmitir el archivo o el tamaño de ventana comunicado por el servidor sea 0, momento en el cual detiene la transmisión hasta que se libere dicho tamaño de ventana.
-\end{itemize}
-
-Al incrementar $p$, esto último ocurre con menor frecuencia, por lo que el cliente continúa enviando paquetes al servidor, y retransmitiendo cuando sea necesario. Como el cliente nunca se bloquea por tamaño de ventana nulo, no existen tiempos ociosos en el proceso de transmisión, o lo que es lo mismo, logra mantenerse el canal de comunicación lo más lleno posible, logrando con ello la reducción del tiempo de transmisión del archivo.
+Nuestra suposición sobre los resultados observados era que podría llegar a existir algún problema a nivel de implementación, donde los threads que se utilizan estuvieran sufriendo algún lock que dependiera del delay introducido para la experimentación al enviar el ACK, pero nuestro análisis del código descartó la hipótesis dejándonos sin explicación para el fenómeno.
 
 
 \subsection{Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs} \label{sec:retr_vs_delay_and_loss}
