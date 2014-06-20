@@ -187,7 +187,7 @@ A su vez, en el caso que se almacenan bytes en el buffer de recepción, la imple
 La acción de enviar un paquete sin payload con el único propósito de comunicar la recepción de un paquete proveniente del interlocutor se refiere de ahora en más como \emph{envío de ACK}.
 
 
-\subsubsection{Envío de ventana actualizada}
+\subsubsection{Envío de paquete de actualización de ventana}
 
 Cuando se leen datos del buffer de recepción, se libera el espacio del buffer previamente ocupado por los datos leídos y se aumenta la ventana de recepción proporcionalmente. Luego se envía al interlocutor un paquete sin payload con el único propósito de comunicar el nuevo valor de la ventana de recepción (campo \window.)
 
@@ -248,7 +248,31 @@ Luego de efectuar este parche, se conjeturó que el error explicado en \ref{sec:
 
 \subsubsection{\emph{Deadlock} por recepción de paquete con ventana nula}
 
-Pendiente.
+En alagunas ocasiones, sucedía durante la transmisión de un archivo entre dos hosts por medio de sockets PTC que el host emisor recibía un paquete con ventana nula, y luego no recibía más paquetes del host receptor. Esto producía que el host emisor quedara perpetuamente a la espera de un paquete con ventana no-nula proveniente del receptor para poder continuar la comunicación, y esto nunca ocurría.
+
+La siguiente es una sucesión de eventos típicas que producía este problema:
+
+\begin{enumerate}
+  \item El host receptor tiene ventana de recepción máxima.
+  
+  \item El host emisor envía un paquete con payload de tamaño igual a la ventana de recepción del host receptor.
+
+  \item El thread de recepción de paquetes del host receptor atiende el paquete recibido, lo almacena en el buffer de recepción y agota la ventana de recepción.
+
+  \item Dicho thread queda suspendido antes de enviar el ACK correspondiente con ventana nula, simulando el fenómeno de latencia.
+
+  \item El thread principal del host receptor, mientras tanto, extrae la totalidad de los bytes en el buffer de recepción, incrementa la ventana de recepción a su valor máximo y envía un paquete de actualización de ventana al host emisor, con valor de ventana máximo.
+
+  \item Inmediatamente después, el thread de recepción de paquetes del host receptor reanuda su ejecución y envía el ACK con ventana nula.
+
+  \item El host emisor recibe un paquete con ventana máxima seguido de otro con ventana nula. Este último anula la ventana de emisión del host emisor. Sin embargo en este instante el nodo receptor tiene ventana de recepción máxima.
+
+  \item El host emisor queda a la espera de un paquete con ventana no-nula proveniente del receptor, pero éste sólo envía paquetes ACK o de actualización de ventana como respuesta a paquetes recibidos del host emisor.
+\end{enumerate}
+
+Como se puede observar, el último evento genera una situación de deadlock, en la que ambos hosts quedan perpetuamente a la espera de un paquete de su contraparte antes de volver a enviar nuevos paquetes.
+
+Se solucionó este problema implementando un nuevo thread que envía periódicamente paquetes de actualización de ventana, denominados paquetes \emph{keepalive}, que informan al nodo emisor el valor correcto de ventana de recepción del nodo receptor, lo cual reanuda la transmisión del archivo.
 
 
 \subsection{Experimentos realizados}
@@ -256,9 +280,9 @@ Pendiente.
 
 Los experimentos descritos a continuación fueron realizados con una versión del la implementación de PTC que incorpora tanto las modificaciones para simular los fenómenos estudiados, explicadas en \ref{sec:simulacion-fenomenos}, como las soluciones a los problemas descritos en \ref{sec:problemas-observados}.
 
-Se realizó un conjunto de experimentos transmitiendo archivos de distintos tamaños desde un nodo \emph{cliente} hacia un nodo \emph{servidor} utilizando sockets PTC. Los experimentos fueron realizados en el contexto de una red LAN donde el cliente se conectaba a un router Linksys WRT54GL de forma inalámbrica (norma 802.11b), mientras que el servidor se conectaba al mismo router de forma cableada (norma 802.3, velocidad 100 Mbits/s.)
+Se realizó un conjunto de experimentos transmitiendo archivos de distintos tamaños desde un host \emph{cliente} hacia un host \emph{servidor} utilizando sockets PTC. Los experimentos fueron realizados en el contexto de una red LAN donde el cliente se conectaba a un router Linksys WRT54GL de forma inalámbrica (norma 802.11b), mientras que el servidor se conectaba al mismo router de forma cableada (norma 802.3, velocidad 100 Mbits/s.)
 
-En los distintos experimentos se hicieron variar el tiempo de retraso de envíos de ACKs y la probabilidad de pérdida de los mismos en el nodo servidor, mientras que en el nodo cliente no se introdujeron retrasos ni pérdidas.
+En los distintos experimentos se hicieron variar el tiempo de retraso de envíos de ACKs y la probabilidad de pérdida de los mismos en el host servidor, mientras que en el host cliente no se introdujeron retrasos ni pérdidas.
 
 Los experimentos realizados se dividen en dos subconjuntos explicados a continuación.
 
