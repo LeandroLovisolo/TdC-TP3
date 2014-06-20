@@ -287,12 +287,12 @@ En los distintos experimentos se hicieron variar el tiempo de retraso de envíos
 Los experimentos realizados se dividen en dos subconjuntos explicados a continuación.
 
 
-\subsubsection{Transmisión de archivos de distintos tamaños, sin retraso ni pérdida de ACKs}
+\subsubsection{Experimento 1: Transmisión de archivos de distintos tamaños, sin retraso ni pérdida de ACKs}
 
 Se transmitieron archivos de tamaños siguiendo la secuencia 50 KB, 100 KB, 150KB, 200 KB, \ldots, 950 KB, 1 MB. Se enviaron 10 archivos de cada tamaño, y para cada transmisión se registró el tiempo total de transmisión y la cantidad de retransmisiones de paquetes.
 
 
-\subsubsection{Transmisión de archivos de tamaño fijo, para distintos tiempos de retraso de envío y probabilidades de pérdida de ACKs}
+\subsubsection{Experimento 2: Transmisión de archivos de tamaño fijo, para distintos tiempos de retraso de envío y probabilidades de pérdida de ACKs}
 
 Se transmitieron 10 archivos de 50 KB para cada par de tiempo de retraso y probabilidad de pérdida de ACKs según las secuencias a continuación:
 
@@ -312,7 +312,10 @@ Para cada transmisión se registró el tiempo total de transmisión y la cantida
 \section{Resultados}
 \label{sec:resultados}
 
-\subsection{Distintos tamaños de archivo, sin retraso ni pérdida de ACKs}
+A continuación se presentan los resultados de los experimentos descritos en \ref{sec:experimentos}.
+
+
+\subsection{Experimento 1: Transmisión de archivos de distintos tamaños, sin retraso ni pérdida de ACKs}
 \label{sec:experimento-distintos-tamanos-de-archivo}
 
 \grafico{time_vs_size}
@@ -332,7 +335,7 @@ Para visualizar mejor estos resultados, filtramos todas las transmisiones con ca
         {plot:retransmissions_vs_size_wo_outliers}
 
 
-\subsection{Tamaño de archivo fijo, distintos tiempos de retraso y probabilidades de pérdida de ACKs}
+\subsection{Experimento 2: Transmisión de archivos de tamaño fijo, para distintos tiempos de retraso de envío y probabilidades de pérdida de ACKs}
 
 \grafico{time_vs_delay_and_loss_probability}
         {Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
@@ -358,6 +361,8 @@ En la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers
 
 \section{Discusión}
 \label{sec:discusion}
+
+Se comentan a continuación algunas observaciones sobre los resultados de los experimentos.
 
 
 \subsection{Tiempo de transferencia en función del tamaño del archivo enviado}
