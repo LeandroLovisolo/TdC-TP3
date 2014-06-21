@@ -34,6 +34,6 @@ informe.pdf: tex/informe.tex $(PLOTS)
 	mv tex/informe.pdf .
 
 clean:
-	rm -f informe.pdf tex/*.aux tex/*.log tex/*.toc tex/*.out tex/*.pdf
+	rm -f informe.pdf tex/*.aux tex/*.log tex/*.toc tex/*.out tex/*.pdf src/*.pyc src/ptc/*.pyc src/test/*.pyc
 
 new: clean all
