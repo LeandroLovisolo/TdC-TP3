@@ -409,19 +409,21 @@ Se cree que la cantidad de retransmisiones no se ve afectada por la probabilidad
 
 \section{Conclusión}
 
-El protocolo PTC, como originalmente fue provisto, contenía una serie de problemas que dificultaban su usabilidad y la experimentación sobre el mismo. Una vez solucionados esos problemas PTC funcionó como protocolo de transporte para los experimentos realizados, de los cuales podemos concluir lo siguiente:
+Las conclusiones a continuación refieren a la implementación del protocolo PTC luego de efectuar las modificaciones explicadas en \ref{sec:simulacion-fenomenos} y \ref{sec:problemas-observados}:
 
 \begin{itemize}
-  \item El tiempo de transmisión aumenta linealmente en relación al tamaño del archivo a enviar.
+  \item El tiempo de transferencia de un archivo entre dos hosts utilizando sockets PTC crece linealmente respecto del tamaño del archivo.
 
-  \item No es posible encontrar una correlación entre la cantidad de retransmisiones y el tamaño de los archivos enviados.
+  \item No se observa correlación entre la cantidad de retransmisiones y el tamaño del archivo transmitido.
 
-  \item A mayor pérdida de paquetes ACK por datos recibidos, menor tiempo de transmisión de datos.
+  \item El tiempo de transferencia del archivo decrece en la medida que crece la probabilidad de pérdida de ACKs provenientes del host destino.
 
-  \item A mayor tiempo de retraso de paquetes ACK por datos recibidos, mayor tiempo de transmisión de datos.
+  \item El tiempo de transferencia del archivo crece en la medida que crece el tiempo de retraso en el envío de ACKs.
 \end{itemize}
 
-Obviando la primera conclusión propuesta resultante de la experimentación, las demás conclusiones obtenidas no pudieron ser explicadas ya que no fueron encontrados relaciones algunas con la implementación o el uso de la red.
+No se formulan hipótesis para explicar las últimas tres conclusiones.
+
+Notar que las modificaciones ad-hoc realizadas sobre la implementación del protocolo para solucionar los problemas descritos en \ref{sec:problemas-observados} alteran el funcionamiento del protocolo. Por este motivo, las conclusiones anteriores no necesariamente aplican a posibles versiones futuras de dicha implementación que solucionen las causas de los problemas observados en lugar de meramente evitar los síntomas de los mismos.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -431,13 +433,13 @@ Obviando la primera conclusión propuesta resultante de la experimentación, las
 
 \section{Trabajo futuro}
 
-Panteamos como trabajo futuro:
+Se propone realizar un análisis de la interacción entre los threads de la implementación del protocolo PTC para descartar la existencia de los problemas de sincronismo que pudieran causar algunos de los problemas mencionados en \ref{sec:problemas-observados}. Luego de esto, se propone crear una nueva iteración de la implementación del protocolo PTC solucionando correctamente los problemas mencionados.
 
-\begin{itemize}
-  \item Una vez corregidos completamente los errores descriptos, realizar nuevamente la experimentación propuesta.
+Con esta nueva iteración, se propone repetir los experimentos realizados en este trabajo y estudiar las diferencias encontradas, con la esperanza de poder entender mejor los fenómenos a los que no se les encontró una explicación.
 
-  \item Realizar un test más exhaustivo sobre otras anomalías que pudieran existir en una comunicación utilizandose el protocolo, por ejemplo, la pérdida de paquetes y tiempos de retraso en los ACK utilizados para notificar un cambio de ventana al liberar datos del buffer de recepción.
-\end{itemize}
+Además, se propone extender la simulación de latencia y pérdida de paquetes para incluir a los paquetes de actualización de ventana, de manera de simular más fielmente los fenómenos en redes de área local cuyo impacto en el protocolo PTC se estudia en este trabajo.
+
+Finalmente se propone estudiar los efectos de simular dichos fenómenos en ambos extremos de la conexión.
 
 
 \end{document}
