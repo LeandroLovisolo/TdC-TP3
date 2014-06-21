@@ -379,14 +379,23 @@ Este resultado resultó sorprendente, ya que por la intuición que se tenía ace
 
 \subsection{Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
 
-Observamos en la figura \ref{plot:time_vs_delay_and_loss_probability} dos resultados interesantes. Primero, mientras mayor es el tiempo de retraso de envío de ACKs, mayor es el tiempo total de transferencia del archivo, y segundo, a mayor probabilidad de pérdida de paquetes de ACKs, menor el tiempo de transferencia. Estos resultados resultan contraintuitivoss en relación a nuestro análisis del código. 
+En la figura \ref{plot:time_vs_delay_and_loss_probability} se observan dos resultados interesantes:
 
-Nuestra suposición sobre los resultados a obtener concluía en que, el tiempo de retraso y la pérdida de paquetes, únicamente influyentes en el envío del ACK que se realiza al recibir datos, no afectaría el tiempo de transmisión total debido a que, como en nuestros experimentos el servidor está continuamente leyendo datos del buffer de recepción, instantáneamente después de haber recibido los datos, el servidor los leería (ya que actúa independientemente de la recepción de paquetes) y mandaría el ACK relacionado a la liberación de memoria del buffer, haciendo que el primer ACK (el ACK al recibir datos) no influyera en el tiempo en el que el cliente pueda enviar datos nuevamente debido a que el mismo ya habría recibido la confirmación de la llegada de sus datos con el ACK relacionado al cambio de tamaño de ventana mencionado anteriormente.
+\begin{itemize}
+  \item El tiempo de transferencia crece en la medida que crece el tiempo de retraso de envío de ACKs.
 
-Nuestra suposición sobre los resultados observados era que podría llegar a existir algún problema a nivel de implementación, donde los threads que se utilizan estuvieran sufriendo algún lock que dependiera del tiempo de retraso introducido para la experimentación al enviar el ACK, pero nuestro análisis del código descartó la hipótesis dejándonos sin explicación para el fenómeno.
+  \item El tiempo de transferencia decrece en la medida que crece la probabilidad de pérdida de ACKs.
+\end{itemize}
+
+Dado que los únicos paquetes que se retrasan o pierden son los ACKs emitidos por el servidor a medida que recibe paquetes del cliente, en particular, los paquetes de actualización de ventana emitidos por el servidor llegan al cliente sin retrasos ni pérdidas. Dichos paquetes también comunican que se recibieron satisfactoriamente los datos enviados por el cliente (campo \ack.) Por este motivo, tiene sentido suponer que el cliente no debería suspender la transmisión hasta que llegue un ACK demorado para poder continuar, ni tampoco debería perder tiempo retransmitiendo paquetes cuyos ACK fueron perdidos. Es decir, tiene sentido suponer que ambos fenómenos no deberían afectar el tiempo total de transferencia.
+
+Las observaciones mencionadas contradicen esta intuición.
+
+Se realizó un análisis informal del código de la implementación del protocolo, bajo la sospecha que la suspensión del thread de recepción de paquetes antes del envío de un ACK pudiera estar bloqueando el acceso a algún recurso utilizado por los otros threads hasta la reanudación del mismo. Esto explicaría el aumento del tiempo de transferencia a medida que aumenta el tiempo de retraso. Sin embargo este análisis no corroboró dicha sospecha.
 
 
-\subsection{Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs} \label{sec:retr_vs_delay_and_loss}
+\subsection{Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
+\label{sec:retr_vs_delay_and_loss}
 
 Observamos en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability} y también en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers} del cúal fueron removidos los outliers (experimentos con 5 o más retransmisiones), que a mayor retraso del envío del ACK al recibir datos por parte del servidor, la cantidad de retransmisiones es, en promedio, estable.
 
