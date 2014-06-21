@@ -372,9 +372,9 @@ En la figura \ref{plot:time_vs_size} podemos observar cómo el tiempo de transfe
 
 \subsection{Retransmisiones en función del tamaño de archivo}
 
-Se obtuvo como resultado de los experimentos realizados sobre retransmisión en función de tamaño del archivo que, salvo unos outliers que pueden identificarse en la figura \ref{plot:retransmissions_vs_size}, la cantidad de retransmisión se mantiene estable en promedio. Puede observarse más detalladamente en la figura \ref{plot:retransmissions_vs_size_wo_outliers}, de la cuál, como el nombre lo indica, fueron eliminados los outliers (retransmisiones eran mayores a 10), que el promedio de retransmisiones cumple con lo dicho.
+Como se observa en la figura \ref{plot:retransmissions_vs_size_wo_outliers}, la cantidad de retransmisiones no parece verse afectada por el tamaño del archivo transmitido. 
 
-Este resultado no fue el que esperábamos, ya que al incrementar la cantidad de datos enviados, esperaríamos obtener una cantidad mayor de retransmisiones, siguiendo la idea intuitiva de que en un uso prolongado se repetirían las retransmisiones.
+Este resultado resultó sorprendente, ya que por la intuición que se tenía acerca del funcionamiento del protocolo, se esperaba la cantidad de retransmisiones fuera proporcional al volúmen de datos enviados.
 
 
 \subsection{Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
