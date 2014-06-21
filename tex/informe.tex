@@ -377,7 +377,7 @@ Como se observa en la figura \ref{plot:retransmissions_vs_size_wo_outliers}, la 
 Este resultado resultó sorprendente, ya que por la intuición que se tenía acerca del funcionamiento del protocolo, se esperaba la cantidad de retransmisiones fuera proporcional al volúmen de datos enviados.
 
 
-\subsection{Tiempo de transferencia en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
+\subsection{Tiempo de transferencia en función del tiempo de retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
 
 En la figura \ref{plot:time_vs_delay_and_loss_probability} se observan dos resultados interesantes:
 
@@ -394,12 +394,12 @@ Las observaciones mencionadas contradicen esta intuición.
 Se realizó un análisis informal del código de la implementación del protocolo, bajo la sospecha que la suspensión del thread de recepción de paquetes antes del envío de un ACK pudiera estar bloqueando el acceso a algún recurso utilizado por los otros threads hasta la reanudación del mismo. Esto explicaría el aumento del tiempo de transferencia a medida que aumenta el tiempo de retraso. Sin embargo este análisis no corroboró dicha sospecha.
 
 
-\subsection{Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
+\subsection{Retransmisiones en función del tiempo de retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
 \label{sec:retr_vs_delay_and_loss}
 
-Observamos en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability} y también en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers} del cúal fueron removidos los outliers (experimentos con 5 o más retransmisiones), que a mayor retraso del envío del ACK al recibir datos por parte del servidor, la cantidad de retransmisiones es, en promedio, estable.
+En la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers} no se observa relación alguna entre cantidad de retransmisiones y tiempo de retraso en envío de ACKs, ni entre cantidad de retransmisiones y probabilidad de pérdida de ACKs.
 
-Suponemos que este fenómeno ocurre debido a que, al aplicar tiempo de retraso al ACK que es enviado automáticamente al recibir datos desde el servidor, y como el servidor lee continuamente del buffer de recepción, liberando su receiving windw rápidamente, el ACK con tiempo de retraso es suplantado por el ACK que envía el servidor al liberar su recieving window, haciendo que más tarde, el ACK enviado con tiempo de retraso sea descartado por el cliente el cúal ya habría recibido el ACK con la adviced window liberada haciendo que la necesidad de retransmisión fuera descartada.
+Se cree que la cantidad de retransmisiones no se ve afectada por la probabilidad de pérdida de ACKs ya que los paquetes de actualización de ventana se envían sin retrasos ni pérdida en todos los casos. Estos paquetes le comunican al cliente el número de secuencia del próximo paquete que se espera recibir (campo \ack), del cual se deduce el número de secuencia del último paquete recibido por el servidor, lo que redunda la información de cualquier ACK cuya pérdida fuera simulada por el servidor.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
