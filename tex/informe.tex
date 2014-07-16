@@ -188,6 +188,7 @@ La acción de enviar un paquete sin payload con el único propósito de comunica
 
 
 \subsubsection{Envío de paquete de actualización de ventana}
+\label{sec:envio-paquete-ventana}
 
 Cuando se leen datos del buffer de recepción, se libera el espacio del buffer previamente ocupado por los datos leídos y se aumenta la ventana de recepción proporcionalmente. Luego se envía al interlocutor un paquete sin payload con el único propósito de comunicar el nuevo valor de la ventana de recepción (campo \window.)
 
@@ -392,12 +393,12 @@ Este resultado resultó sorprendente, ya que por la intuición que se tenía ace
 En la figura \ref{plot:time_vs_delay_and_loss_probability} se observan dos resultados interesantes:
 
 \begin{itemize}
-  \item El tiempo de transferencia crece en la medida que crece el tiempo de retraso de envío de ACKs.
+  \item El tiempo de transferencia crece linealmente en la medida que crece el tiempo de retraso de envío de ACKs.
 
   \item El tiempo de transferencia decrece en la medida que crece la probabilidad de pérdida de ACKs.
 \end{itemize}
 
-Dado que los únicos paquetes que se retrasan o pierden son los ACKs emitidos por el servidor a medida que recibe paquetes del cliente, en particular, los paquetes de actualización de ventana emitidos por el servidor llegan al cliente sin retrasos ni pérdidas. Dichos paquetes también comunican que se recibieron satisfactoriamente los datos enviados por el cliente (campo \ack.) Por este motivo, tiene sentido suponer que el cliente no debería suspender la transmisión hasta que llegue un ACK demorado para poder continuar, ni tampoco debería perder tiempo retransmitiendo paquetes cuyos ACK fueron perdidos. Es decir, tiene sentido suponer que ambos fenómenos no deberían afectar el tiempo total de transferencia.
+Dado que los únicos paquetes que se retrasan o pierden son los ACKs emitidos por el servidor a medida que recibe paquetes del cliente, en particular, los paquetes de actualización de ventana emitidos por el servidor llegan al cliente sin retrasos ni pérdidas (ver \ref{sec:envio-paquete-ventana} para más detalles sobre estos paquetes.) Dichos paquetes también comunican que se recibieron satisfactoriamente los datos enviados por el cliente (campo \ack.) Por este motivo, tiene sentido suponer que el cliente no debería suspender la transmisión hasta que llegue un ACK demorado para poder continuar, ni tampoco debería perder tiempo retransmitiendo paquetes cuyos ACK fueron perdidos. Es decir, tiene sentido suponer que ambos fenómenos no deberían afectar el tiempo total de transferencia.
 
 Las observaciones mencionadas contradicen esta intuición.
 
