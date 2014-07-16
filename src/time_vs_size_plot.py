@@ -11,8 +11,9 @@ class TimeVsSizePlot(plot.Plot):
         keys.sort()
         sizes = [size / 1000 for size in keys]
         avg_times = [statistics[key]['avg_time'] for key in keys]
+        stdev_times = [statistics[key]['stdev_time'] for key in keys]
 
-        plt.plot(sizes, avg_times)
+        plt.errorbar(sizes, avg_times, stdev_times)
         plt.xticks(sizes, sizes, rotation=90)
         plt.xlim([sizes[0], sizes[-1]])
         plt.title(u'Tiempo de transferencia en función del tamaño de archivo')
