@@ -3,6 +3,7 @@ PLOTS = tex/time_vs_size.pdf \
 		tex/retransmissions_vs_size.pdf \
 		tex/retransmissions_vs_size_wo_outliers.pdf \
         tex/time_vs_delay_and_loss_probability.pdf \
+        tex/time_vs_delay_and_loss_probability_min_max.pdf \
         tex/retransmissions_vs_delay_and_loss_probability.pdf \
         tex/retransmissions_vs_delay_and_loss_probability_wo_outliers.pdf
 
@@ -21,6 +22,9 @@ tex/retransmissions_vs_size_wo_outliers.pdf: $(DB) src/plot.py src/retransmissio
 
 tex/time_vs_delay_and_loss_probability.pdf: $(DB) src/plot.py src/time_vs_delay_and_loss_probability_plot.py
 	./time_vs_delay_and_loss_probability_plot -o tex/time_vs_delay_and_loss_probability.pdf
+
+tex/time_vs_delay_and_loss_probability_min_max.pdf: $(DB) src/plot.py src/time_vs_delay_and_loss_probability_plot.py
+	./time_vs_delay_and_loss_probability_plot --only-min-and-max-loss-probabilities -o tex/time_vs_delay_and_loss_probability_min_max.pdf
 
 tex/retransmissions_vs_delay_and_loss_probability.pdf: $(DB) src/plot.py src/retransmissions_vs_delay_and_loss_probability_plot.py
 	./retransmissions_vs_delay_and_loss_probability_plot -o tex/retransmissions_vs_delay_and_loss_probability.pdf
