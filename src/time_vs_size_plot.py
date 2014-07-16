@@ -7,13 +7,12 @@ class TimeVsSizePlot(plot.Plot):
 
     def do_plot(self, plt, fig, db, args):
         statistics = db.get_statistics_by_size()
-        data = statistics.items()
-        data.sort()
-        data = zip(*data)
-        sizes = [s / 1000 for s in data[0]]
-        avgs = zip(*data[1])[0]
+        keys = statistics.keys()
+        keys.sort()
+        sizes = [size / 1000 for size in keys]
+        avg_times = [statistics[key]['avg_time'] for key in keys]
 
-        plt.plot(sizes, avgs)
+        plt.plot(sizes, avg_times)
         plt.xticks(sizes, sizes, rotation=90)
         plt.xlim([sizes[0], sizes[-1]])
         plt.title(u'Tiempo de transferencia en función del tamaño de archivo')

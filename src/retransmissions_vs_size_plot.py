@@ -7,13 +7,16 @@ class RetransmissionsVsSizePlot(plot.Plot):
 
     def do_plot(self, plt, fig, db, args):
         statistics = db.get_statistics_by_size(exclude_outliers=args.exclude_outliers)
-        data = statistics.items()
-        data.sort()
-        data = zip(*data)
-        sizes = [s / 1000 for s in data[0]]
-        avgs = zip(*data[1])[1]
+        keys = statistics.keys()
+        keys.sort()
+        sizes = [size / 1000 for size in keys]
+        avg_retxs = [statistics[key]['avg_retx'] for key in keys]
+        stdev_retxs = [statistics[key]['stdev_retx'] for key in keys]
 
-        plt.plot(sizes, avgs)
+        if args.exclude_outliers:
+            plt.errorbar(sizes, avg_retxs, yerr=stdev_retxs)
+        else:
+            plt.plot(sizes, avg_retxs)
         plt.xticks(sizes, sizes, rotation=90)
         plt.xlim([sizes[0], sizes[-1]])
         plt.title(u'Cantidad de retransmisiones en función del tamaño de archivo')

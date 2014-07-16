@@ -12,14 +12,12 @@ class TimeVsDelayAndLossProbabilityPlot(plot.Plot):
 
         for loss in loss_probabilities:
             statistics = db.get_statistics_by_delay_and_loss_probability(loss)
+            keys = statistics.keys()
+            keys.sort()
+            delays = [int(delay * 1000) for delay in keys]
+            avg_times = [statistics[key]['avg_time'] for key in keys]
 
-            data = statistics.items()
-            data.sort()
-            data = zip(*data)
-            delays = [s * 1000 for s in data[0]]
-            avgs = zip(*data[1])[0]
-
-            plt.plot(delays, avgs, color=colors.pop(), label=str(loss), lw=2)
+            plt.plot(delays, avg_times, color=colors.pop(), label=str(loss), lw=2)
 
         plt.xticks(delays, delays, rotation=90)
         plt.xlim([delays[0], delays[-1]])

@@ -2,6 +2,25 @@
 
 import sys
 import sqlite3
+import math
+
+
+# Stolen from:
+# http://stackoverflow.com/questions/2298339/standard-deviation-for-sqlite
+class StdevFunc:
+    def __init__(self):
+        self.M = 0.0
+        self.S = 0.0
+        self.k = 0
+
+    def step(self, value):
+        tM = self.M
+        self.k += 1
+        self.M += (value - tM) / self.k
+        self.S += (value - tM) * (value - self.M)
+
+    def finalize(self):
+        return math.sqrt(self.S / (self.k-1))
 
 
 class DB:
@@ -14,6 +33,8 @@ class DB:
 
     def __init__(self):
         self.conn = sqlite3.connect('experiments.db')
+        self.conn.create_aggregate('stdev', 1, StdevFunc)
+
         
         with self as c:
             c.execute('''CREATE TABLE IF NOT EXISTS experiments (
@@ -61,14 +82,15 @@ class DB:
 
             statistics = {}
             for size in sizes:
-                c.execute('''SELECT avg(time), avg(retx) FROM records WHERE
+                c.execute('''SELECT avg(time), stdev(time), avg(retx), stdev(retx) FROM records WHERE
                              experiment_id = ? AND
                              retx <= ? AND
                              size = ?''', (experiment_id, max_retx, size))
                 row = c.fetchone()
-                time = row[0]
-                retransmissions = row[1]
-                statistics[size] = (time, retransmissions)
+                statistics[size] = {'avg_time':   row[0],
+                                    'stdev_time': row[1],
+                                    'avg_retx':   row[2],
+                                    'stdev_retx': row[3]}
 
         return statistics
 
@@ -97,20 +119,21 @@ class DB:
                                     WHERE experiment_id = ?''', (experiment_id,)):
                 delays.append(row[0] / 1000.0)
 
-            time_vs_delay = {}
+            statistics = {}
             for delay in delays:
-                c.execute('''SELECT avg(time), avg(retx) FROM records WHERE
+                c.execute('''SELECT avg(time), stdev(time), avg(retx), stdev(retx) FROM records WHERE
                              experiment_id = ? AND
                              retx <= ? AND
                              CAST(delay * 1000 AS INT) = CAST(? * 1000 AS INT) AND
                              CAST(loss * 1000 AS INT)  = CAST(? * 1000 AS INT)''',
                           (experiment_id, max_retx, delay, loss_probability))
                 row = c.fetchone()
-                time = row[0]
-                retransmissions = row[1]
-                time_vs_delay[delay] = (time, retransmissions)
+                statistics[delay] = {'avg_time':   row[0],
+                                     'stdev_time': row[1],
+                                     'avg_retx':   row[2],
+                                     'stdev_retx': row[3]}
 
-        return time_vs_delay
+        return statistics
 
     def __enter__(self):
         self.cur = self.conn.cursor()
