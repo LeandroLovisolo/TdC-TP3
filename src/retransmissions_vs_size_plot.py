@@ -21,7 +21,7 @@ class RetransmissionsVsSizePlot(plot.Plot):
         plt.xlim([sizes[0], sizes[-1]])
         plt.title(u'Cantidad de retransmisiones en función del tamaño de archivo')
         plt.xlabel(u'Tamaño de archivo (KB)')
-        plt.ylabel(u'Retransmisiones')
+        plt.ylabel(u'Retransmisiones promedio')
 
     def add_arguments(self, parser):
         parser.add_argument('--exclude-outliers', action='store_true')
