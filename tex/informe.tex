@@ -284,13 +284,14 @@ Se realizó un conjunto de experimentos transmitiendo archivos de distintos tama
 
 En los distintos experimentos se hicieron variar el tiempo de retraso de envíos de ACKs y la probabilidad de pérdida de los mismos en el host servidor, mientras que en el host cliente no se introdujeron retrasos ni pérdidas.
 
-Utilizamos para la medición del tiempo, la función time del módulo time de Python, tomando una medición inmediatamente antes de comenzar a transmitir y otra justo después de cerrar el socket:
+En todos los experimentos las mediciones de tiempo total de transmisión fueron realizadas usando la función \texttt{time} del módulo \texttt{time} de Python. Estas mediciones se realizan tomando el tiempo inmediatamente antes de comenzar a transmitir y luego justo después de cerrar el socket. El siguiente extracto de código ejemplifica lo explicado:
+
 \begin{verbatim}
-    t0 = time.time()
+    t0 = time.time()          # Tiempo inicial
     sock.send(datos)
     sock.shutdown(SHUT_WR)
-    t1 = time.time()
-    t = t1 - t0
+    t1 = time.time()          # Tiempo final
+    t = t1 - t0               # Tiempo total de transferencia
 \end{verbatim}
 
 Los experimentos realizados se dividen en dos subconjuntos explicados a continuación.
