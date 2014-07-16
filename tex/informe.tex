@@ -386,9 +386,9 @@ En la figura \ref{plot:time_vs_size} podemos observar cómo el tiempo de transfe
 
 No se sabe con certeza la causa de los picos en la figura \ref{plot:retransmissions_vs_size} (tamaños de archivo 800, 900  950 KB.) Se sospecha que la causa es un deterioro en la calidad de la señal Wi-Fi entre el host cliente y el router\footnote{Topología de la red descrita en \ref{sec:experimentos}}. La transmisión de los archivos se realizó de forma secuencial, por tamaño de archivo en orden creciente. Entonces una posible explicación es que la señal haya comenzado a deteriorarse en algún punto durante la transmisión del archivo de 800 KB, y que se haya normalizado durante la transmisión del archivo de tamaño 950 KB.
 
-Dichos picos fueron filtrados en la figura \ref{plot:retransmissions_vs_size_wo_outliers}. En ésta se observa que la cantidad de retransmisiones no parece verse afectada por el tamaño del archivo transmitido. 
+Dichos picos fueron filtrados en la figura \ref{plot:retransmissions_vs_size_wo_outliers}. En ésta se observa que la cantidad de retransmisiones no parece verse afectada por el tamaño del archivo transmitido. Esto resulta sorprendente, ya que por la intuición que se tenía del funcionamiento del protocolo, se esperaba la cantidad de retransmisiones fuera proporcional al volumen de datos enviados.
 
-Ésto resulta sorprendente, ya que por la intuición que se tenía del funcionamiento del protocolo, se esperaba la cantidad de retransmisiones fuera proporcional al volumen de datos enviados.
+Se desconoce la causa de la varianza en dicha figura (ver tamaños de archivo 200 y 300 KB), pero se sospecha que se debe a la pequeña cantidad de repeticiones realizadas durante los experimentos (10 repeticiones por cada tamaño de archivo.)
 
 
 \subsection{Tiempo de transferencia en función del tiempo de retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
