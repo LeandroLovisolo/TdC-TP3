@@ -11,6 +11,7 @@
 \usepackage{amsfonts}
 \usepackage{amsthm}
 \usepackage{verbatim}
+\usepackage{fancyvrb}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{enumitem} % Provee macro \setlist
@@ -339,7 +340,7 @@ A continuación se presentan los resultados de los experimentos descritos en \re
 
 Los picos que se observan en la figura \ref{plot:retransmissions_vs_size} se deben a la presencia de outliers cuya causa no fue identificada. Ver discusión en la sección \ref{sec:discusion-retransmisiones-vs-tam}.
 
-Para visualizar mejor estos resultados, filtramos todas las transmisiones con cantidad de retransmisiones superior a 10, que representan aproximadamente el 3\% del total de las mediciones. El subconjunto obtenido se ilustra en la figura \ref{plot:retransmissions_vs_size_wo_outliers}.
+Para visualizar mejor estos resultados, se filtraron todas las transmisiones con cantidad de retransmisiones superior a 10, que representan aproximadamente el 3\% del total de las mediciones. El subconjunto obtenido se ilustra en la figura \ref{plot:retransmissions_vs_size_wo_outliers}.
 
 \grafico{retransmissions_vs_size_wo_outliers}
         {Retransmisiones en función del tamaño de archivo, excluyendo outliers}
@@ -356,7 +357,7 @@ Para visualizar mejor estos resultados, filtramos todas las transmisiones con ca
         {Retransmisiones en función del retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
         {plot:retransmissions_vs_delay_and_loss_probability}
 
-De manera similar a lo que ocurre en \ref{sec:experimento-distintos-tamanos-de-archivo}, los picos observados en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability} se deben a outliers que suponemos se deben a errores de medición.
+Tal como en \ref{sec:experimento-distintos-tamanos-de-archivo}, no se conoce la causa de los picos observados en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability}.
 
 En la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers} se excluyen las mediciones con cantidad de retransmisiones superior a 10, que representan aproximadamente el 2\% del total de las mediciones realizadas en este experimento.
 
@@ -384,7 +385,7 @@ En la figura \ref{plot:time_vs_size} podemos observar cómo el tiempo de transfe
 \subsection{Retransmisiones en función del tamaño de archivo}
 \label{sec:discusion-retransmisiones-vs-tam}
 
-No se sabe con certeza la causa de los picos en la figura \ref{plot:retransmissions_vs_size} (tamaños de archivo 800, 900  950 KB.) Se sospecha que la causa es un deterioro en la calidad de la señal Wi-Fi entre el host cliente y el router\footnote{Topología de la red descrita en \ref{sec:experimentos}}. La transmisión de los archivos se realizó de forma secuencial, por tamaño de archivo en orden creciente. Entonces una posible explicación es que la señal haya comenzado a deteriorarse en algún punto durante la transmisión del archivo de 800 KB, y que se haya normalizado durante la transmisión del archivo de tamaño 950 KB.
+No se sabe con certeza la causa de los picos en la figura \ref{plot:retransmissions_vs_size} (tamaños de archivo 800, 900 y 950 KB.) Se sospecha que la causa es un deterioro en la calidad de la señal Wi-Fi entre el host cliente y el router\footnote{Topología de la red descrita en \ref{sec:experimentos}}. La transmisión de los archivos se realizó de forma secuencial, por tamaño de archivo en orden creciente. Entonces una posible explicación es que la señal haya comenzado a deteriorarse en algún punto durante la transmisión del archivo de 800 KB, y que se haya normalizado durante la transmisión del archivo de tamaño 950 KB.
 
 Dichos picos fueron filtrados en la figura \ref{plot:retransmissions_vs_size_wo_outliers}. En ésta se observa que la cantidad de retransmisiones no parece verse afectada por el tamaño del archivo transmitido. Esto resulta sorprendente, ya que por la intuición que se tenía del funcionamiento del protocolo, se esperaba la cantidad de retransmisiones fuera proporcional al volumen de datos enviados.
 
@@ -401,19 +402,89 @@ En la figura \ref{plot:time_vs_delay_and_loss_probability} se observan dos resul
   \item El tiempo de transferencia decrece en la medida que crece la probabilidad de pérdida de ACKs.
 \end{itemize}
 
-Dado que los únicos paquetes que se retrasan o pierden son los ACKs emitidos por el servidor a medida que recibe paquetes del cliente, en particular, los paquetes de actualización de ventana emitidos por el servidor llegan al cliente sin retrasos ni pérdidas (ver \ref{sec:envio-paquete-ventana} para más detalles sobre estos paquetes.) Dichos paquetes también comunican que se recibieron satisfactoriamente los datos enviados por el cliente (campo \ack.) Por este motivo, tiene sentido suponer que el cliente no debería suspender la transmisión hasta que llegue un ACK demorado para poder continuar, ni tampoco debería perder tiempo retransmitiendo paquetes cuyos ACK fueron perdidos. Es decir, tiene sentido suponer que ambos fenómenos no deberían afectar el tiempo total de transferencia.
+Ambos hechos contradicen la intuición que se tenía sobre el funcionamiento del protocolo antes de realizar los experimentos: sólo se retrasan y/o pierden los paquetes ACK. Los paquetes de actualización de ventana (ver \ref{sec:envio-paquete-ventana}) son enviados sin retrasos ni pérdidas. Estos paquetes también acarrean el valor actualizado del próximo número de secuencia esperado (campo \ack). Ahora bien, los paquetes de actualización de ventana se envían cada vez que un host extrae bytes de su buffer de entrada y libera espacio en el mismo. Pero como en estos experimentos el servidor está leyendo constantemente de su buffer de entrada, cuando el servidor recibe un paquete del cliente con datos, éste contesta inmediatamente con un paquete de actualización de ventana.
 
-Las observaciones mencionadas contradicen esta intuición.
+En conclusión, el servidor contesta con un paquete ACK y con un paquete de actualización de ventana cada vez que recibe un paquete con datos del cliente\footnote{Esto es lo que ocurre cuando no se está simulando retraso ni pérdida de ACKs.}. El paquete de actualización de ventana entonces actúa como backup para comunicar el próximo número de secuencia esperado, y el cliente siempre recibe ese número inmediatamente después que el servidor recibe datos del cliente, por más que se retrasen o pierdan los paquetes ACK.
 
-Se realizó un análisis informal del código de la implementación del protocolo, bajo la sospecha que la suspensión del thread de recepción de paquetes antes del envío de un ACK pudiera estar bloqueando el acceso a algún recurso utilizado por los otros threads hasta la reanudación del mismo. Esto explicaría el aumento del tiempo de transferencia a medida que aumenta el tiempo de retraso. Sin embargo este análisis no corroboró dicha sospecha.
+Luego el tiempo de transmisión no debería verse afectado por el retraso o pérdida de ACKs, ya que el cliente nunca debería quedarse esperando la recepción de un ACK demorado para continuar con la transmisión, ni deberían ocurrir timeouts y retransmisiones por la pérdida de los mismos.
+
+Esta intuición se explica con más detalle en la sección \ref{sec:discusion-intuicion}. 
+
+No se logró hipotetizar una causa para el crecimiento del tiempo de transferencia respecto del crecimiento del tiempo de retraso en envío de ACKs. Se realizó un análisis informal del código de la implementación del protocolo, bajo la sospecha que la suspensión del thread de recepción de paquetes antes del envío de un ACK pudiera estar bloqueando el acceso a algún recurso utilizado por los otros threads hasta la reanudación del mismo. Esto explicaría el aumento del tiempo de transferencia a medida que aumenta el tiempo de retraso. Sin embargo este análisis no corroboró dicha sospecha.
+
+En cuanto a la reducción del tiempo de transferencia respecto del crecimiento de la probabilidad de pérdida de ACKs, se sospecha que se debe a una reducción del uso de CPU tanto en el cliente como en el servidor\footnote{Recordar que el stack PTC está programado en lenguaje Python, que no se destaca por ser rápido. Además éste corre como aplicación en el espacio de usuario en lugar de formar parte del sistema operativo, con la penalidad de performance que eso implica.} como consecuencia de procesar menos paquetes. Además, se sospecha que el menor tráfico en la red resultante de transmitir menos paquetes contribuye en la reducción del tiempo total de transferencia.
 
 
 \subsection{Retransmisiones en función del tiempo de retraso en envío de ACKs para distintas probabilidades de pérdida de ACKs}
-\label{sec:retr_vs_delay_and_loss}
 
-En la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers} no se observa relación alguna entre cantidad de retransmisiones y tiempo de retraso en envío de ACKs, ni entre cantidad de retransmisiones y probabilidad de pérdida de ACKs.
+De manera similar a \ref{sec:discusion-retransmisiones-vs-tam}, los picos observados en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability} se atribuyen al deterioro momentáneo de la calidad de la señal Wi-Fi entre el host cliente y el router.
 
-Se cree que la cantidad de retransmisiones no se ve afectada por la probabilidad de pérdida de ACKs ya que los paquetes de actualización de ventana se envían sin retrasos ni pérdida en todos los casos. Estos paquetes le comunican al cliente el número de secuencia del próximo paquete que se espera recibir (campo \ack), del cual se deduce el número de secuencia del último paquete recibido por el servidor, lo que redunda la información de cualquier ACK cuya pérdida fuera simulada por el servidor.
+Dichos picos fueron filtrados en la figura \ref{plot:retransmissions_vs_delay_and_loss_probability_wo_outliers}. No se observa relación alguna entre cantidad de retransmisiones y tiempo de retraso en envío de ACKs, ni entre cantidad de retransmisiones y probabilidad de pérdida de ACKs.
+
+
+\subsection{Intuición del funcionamiento del protocolo previa a la experimentación}
+\label{sec:discusion-intuicion}
+
+La siguiente sucesión de eventos describe un escenario típico que ocurre cuando un host recibe un paquete PTC con payload no vacío, asumiendo que no hay pérdida ni reordenamiento de paquetes.
+
+\begin{enumerate}
+  \item El host agrega los datos recibidos a su buffer de entrada.
+  
+  \item Si su buffer de salida está vacío, el host envía un paquete sin datos, tal que su campo \ack indica el número de secuencia del próximo byte que se espera recibir.
+  
+  \item Si su buffer de salida no está vacío, lo anterior no ocurre y simplemente el próximo paquete a emitir con datos del buffer de salida comunicará en su campo \ack dicho número de secuencia (piggybacking.)
+  
+  \item Eventualmente la aplicación lee del buffer de entrada, liberando espacio en el mismo. Cuando esto ocurre, el host envía un paquete sin datos (independiente de si hay datos en el buffer de salida o no) con el nuevo valor de ventana correspondiente, con el único propósito de actualizar la ventana de emisión del host del otro lado de la conexión.
+\end{enumerate}
+
+En el contexto de los experimentos realizados, el host servidor nunca envía datos al cliente, y lee constantemente del buffer de entrada hasta que se reciben la totalidad de los bytes esperados. En consecuencia, siempre ocurre el paso 2 y nunca ocurre el paso 3 (piggybacking), pues el buffer de salida siempre está vacío. Además, el paso 4 ocurre inmediatamente después del paso 2, porque la aplicación lee continuamente de su buffer de entrada, y los bytes del buffer de entrada son desalojados inmediatamente después de ser recibidos.
+
+Es decir, inmediatamente después de recibir un paquete con datos, el servidor responde con dos paquetes sin datos:
+
+\begin{itemize}
+  \item El paquete ACK, cuyo campo \ack refleja el reconocimiento de los últimos datos recibidos y su campo ventana decrementado en función a la cantidad de bytes recibidos, reflejando la adición de esos bytes al buffer de entrada del servidor.
+
+  \item El paquete de actualización de ventana, idéntico al ACK salvo por el campo ventana, que refleja el incremento e la ventana de recepción luego de extraer esos bytes del buffer de entrada.
+\end{itemize}
+
+Tiene sentido entonces, en el contexto de los experimentos realizados, pensar el paquete de actualización de ventana como un segundo paquete ACK que actúa como backup del primero.
+
+Considerar, a modo de ejemplo, la siguiente captura hipotética durante alguno de los experimentos realizados sin retraso ni pérdida de ACKs, entre un host cliente con IP 192.168.0.1 y un host servidor con IP 10.0.0.1. Cada paquete enviado por el cliente agota la totalidad de la ventana de recepción del servidor, y el cliente queda a la espera de la recepción de un paquete del servidor con ventana no nula antes de poder enviar el siguiente paquete con datos.
+
+\begin{Verbatim}[fontsize=\small]
+1. [ SRC=192.168.0.1 | DST=10.0.0.1    | Flags=ACK | #SEQ=20000 | #ACK=100   | WND=9999 | LEN=1024 ]
+2. [ SRC=10.0.0.1    | DST=192.168.0.1 | Flags=ACK | #SEQ=100   | #ACK=21024 | WND=0    | LEN=0    ]
+3. [ SRC=10.0.0.1    | DST=192.168.0.1 | Flags=ACK | #SEQ=100   | #ACK=21024 | WND=1024 | LEN=0    ]
+4. [ SRC=192.168.0.1 | DST=10.0.0.1    | Flags=ACK | #SEQ=21024 | #ACK=100   | WND=9999 | LEN=1024 ]
+5. [ SRC=10.0.0.1    | DST=192.168.0.1 | Flags=ACK | #SEQ=100   | #ACK=22048 | WND=0    | LEN=0    ]
+6. [ SRC=10.0.0.1    | DST=192.168.0.1 | Flags=ACK | #SEQ=100   | #ACK=22048 | WND=1024 | LEN=0    ]
+\end{Verbatim}
+
+Suponer ahora que durante el experimento anterior el servidor retrasa $n$ segundos el envío de los paquetes ACK (paquetes 2 y 5). La siguiente captura refleja este escenario.
+
+\begin{Verbatim}[fontsize=\small]
+   [ SRC=192.168.0.1 | DST=10.0.0.1    | Flags=ACK | #SEQ=20000 | #ACK=100   | WND=9999 | LEN=1024 ]
+   [ SRC=10.0.0.1    | DST=192.168.0.1 | Flags=ACK | #SEQ=100   | #ACK=21024 | WND=1024 | LEN=0    ]
+   [ SRC=192.168.0.1 | DST=10.0.0.1    | Flags=ACK | #SEQ=21024 | #ACK=100   | WND=9999 | LEN=1024 ]
+   [ SRC=10.0.0.1    | DST=192.168.0.1 | Flags=ACK | #SEQ=100   | #ACK=22048 | WND=1024 | LEN=0    ]
+\end{Verbatim}
+
+$\vdots$ 
+
+($n$ segundos después)
+
+\begin{Verbatim}[fontsize=\small]
+   [ SRC=10.0.0.1    | DST=192.168.0.1 | Flags=ACK | #SEQ=100   | #ACK=21024 | WND=0    | LEN=0    ]
+   [ SRC=10.0.0.1    | DST=192.168.0.1 | Flags=ACK | #SEQ=100   | #ACK=22048 | WND=0    | LEN=0    ]
+\end{Verbatim}
+
+Si bien los paquetes ACK se ven demorados, los paquetes de actualización de ventana llegan instantáneamente. Estos paquetes no sólo informan que se recibieron correctamente los datos transmitidos (campo \ack) sino que además anuncian una ventana de recepción no nula. \emph{Por lo tanto el cliente puede continuar transmitiendo normalmente y sin demoras}.
+
+En el caso que se estuviera simulando pérdida de paquetes ACK, dichos paquetes podrían pensarse como paquetes que son demorados infinitamente, por lo que el análisis de la situación es idéntico al anterior.
+
+En conclusión, parece razonable intuír que ni el retraso ni la pérdida simulada de ACKs deberían afectar el tiempo de transferencia de un archivo, ya que por más que se retrasen o pierdan ACKs, los paquetes de actualización de ventana actúan como backup de éstos, y el cliente puede seguir transmitiendo sin problemas.
+
+Sin embargo, de acuerdo a lo discutido en las secciones anteriores, ésta intuición no verifica los resultados obtenidos luego de la experimentación.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -436,8 +507,6 @@ Las conclusiones a continuación refieren a la implementación del protocolo PTC
 
   \item El tiempo de transferencia del archivo crece en la medida que crece el tiempo de retraso en el envío de ACKs.
 \end{itemize}
-
-No se formulan hipótesis para explicar las últimas tres conclusiones.
 
 Notar que las modificaciones ad-hoc realizadas sobre la implementación del protocolo para solucionar los problemas descritos en \ref{sec:problemas-observados} alteran el funcionamiento del protocolo. Por este motivo, las conclusiones anteriores no necesariamente aplican a posibles versiones futuras de dicha implementación que solucionen las causas de los problemas observados en lugar de meramente evitar los síntomas de los mismos.
 
